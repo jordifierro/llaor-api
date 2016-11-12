@@ -10,8 +10,8 @@ def dictionary_list(request):
     List all definitions
     """
     if request.method == 'GET':
-        definition = Definition.objects.all()
-        serializer = DefinitionSerializer(definition, many=True)
+        definitions = Definition.objects.all()
+        serializer = DefinitionSerializer(definitions, many=True)
         return Response(serializer.data)
 
 @api_view(['GET'])
@@ -19,11 +19,10 @@ def definition_detail(request, key):
     """
     Retrieve definition
     """
-    try:
-        definition = Definition.objects.get(word=key)
-    except Definition.DoesNotExist:
+    definitions = Definition.objects.filter(word=key)
+    if len(definitions) == 0:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = DefinitionSerializer(definition)
+        serializer = DefinitionSerializer(definitions, many=True)
         return Response(serializer.data)
