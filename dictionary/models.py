@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Definition(models.Model):
     # data
     word = models.CharField(max_length=30)

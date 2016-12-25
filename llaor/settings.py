@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +26,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['llaor.herokuapp.com',]
+ALLOWED_HOSTS = ['llaor.herokuapp.com', ]
 
 
 # Application definition
@@ -75,9 +76,8 @@ WSGI_APPLICATION = 'llaor.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-import dj_database_url
 db_from_env = dj_database_url.config()
-DATABASES = { 'default' : db_from_env }
+DATABASES = {'default': db_from_env}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators

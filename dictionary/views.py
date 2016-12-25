@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view
 from dictionary.models import Definition
 from dictionary.serializers import DefinitionSerializer
 
+
 @api_view(['GET'])
 def dictionary_list(request):
     """
@@ -13,6 +14,7 @@ def dictionary_list(request):
         definitions = Definition.objects.all()
         serializer = DefinitionSerializer(definitions, many=True)
         return Response(serializer.data)
+
 
 @api_view(['GET'])
 def definition_detail(request, key):
