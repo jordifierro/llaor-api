@@ -4,7 +4,9 @@ from django.db import models
 class Definition(models.Model):
     # data
     word = models.CharField(max_length=30)
-    phonetic = models.CharField(max_length=30, blank=True)
+    phonetic = models.CharField(max_length=60, blank=True)
+    scientific = models.CharField(max_length=60, blank=True)
+    type = models.CharField(max_length=30, blank=True)
     meaning = models.TextField()
     extra_info = models.TextField(blank=True)
     private_notes = models.TextField(blank=True)
