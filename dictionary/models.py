@@ -13,6 +13,7 @@ class Definition(models.Model):
     synonyms = models.CharField(max_length=60, blank=True)
     related = models.CharField(max_length=60, blank=True)
     origin = models.CharField(max_length=60, blank=True)
+    semantic_field = models.CharField(max_length=60, blank=True)
 
     # metadata
     semantic_group = models.PositiveSmallIntegerField(default=1)
