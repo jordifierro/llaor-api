@@ -16,6 +16,7 @@ import dj_database_url
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+LOCAL_DEPLOY = bool(int(os.environ['LOCAL_DEPLOY']))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -24,9 +25,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = bool(int(os.environ['DEBUG']))
 
-ALLOWED_HOSTS = ['llaor.herokuapp.com', ]
+if not LOCAL_DEPLOY:
+    ALLOWED_HOSTS = [os.environ['ALLOWED_HOSTS'], ]
 
 
 # Application definition
@@ -75,9 +77,20 @@ WSGI_APPLICATION = 'llaor.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
-db_from_env = dj_database_url.config()
-DATABASES = {'default': db_from_env}
+if LOCAL_DEPLOY:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ['DATABASE_NAME'],
+            'USER': os.environ['DATABASE_USER'],
+            'PASSWORD': os.environ['DATABASE_PASS'],
+            'HOST': '',
+            'PORT': '',
+        }
+    }
+else:
+    db_from_env = dj_database_url.config()
+    DATABASES = {'default': db_from_env}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -120,9 +133,7 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = '/static/'
 
 # Extra places for collectstatic to find static files.
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, 'static'),
-)
+STATICFILES_DIRS = (os.path.join(PROJECT_ROOT, 'static'), )
 
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
