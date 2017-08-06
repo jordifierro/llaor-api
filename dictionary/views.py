@@ -1,12 +1,18 @@
 from dictionary.models import Definition
-from dictionary.repositories import MeaningRepo
 from dictionary.serializers import MeaningSerializer
 
 
 class DictionaryView(object):
 
+    def __init__(self, navigator):
+        self.navigator = navigator
+
     def get(self):
-        words = Definition.objects.values('word').order_by('word')
+        words = list(Definition.objects.values('word').order_by('word'))
+        for word in words:
+            print(word)
+            print(type(word))
+            word['uri'] = self.navigator.get_word_uri(word['word'])
 
         body = list(words)
         status = 200
@@ -15,9 +21,13 @@ class DictionaryView(object):
 
 class WordView(object):
 
-    def get(self, word):
-        meanings = MeaningRepo.get_meanings_for_word(word)
+    def __init__(self, navigator, meaning_repo):
+        self.navigator = navigator
+        self.meaning_repo = meaning_repo
 
-        body = MeaningSerializer.serialize_multiple(meanings)
+    def get(self, word):
+        meanings = self.meaning_repo.get_meanings_for_word(word)
+
+        body = MeaningSerializer.serialize_multiple(meanings, self.navigator)
         status = 200
         return body, status
