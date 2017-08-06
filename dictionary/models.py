@@ -17,13 +17,12 @@ class Definition(models.Model):
 
     # metadata
     semantic_group = models.PositiveSmallIntegerField(default=1)
-    priority = models.PositiveSmallIntegerField(default=1)
     source = models.CharField(max_length=60)
     reviewed = models.BooleanField(default=True)
     public = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ('word', 'semantic_group', 'priority')
+        ordering = ('word', 'semantic_group')
 
     def __str__(self):
         return self.word
