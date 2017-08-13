@@ -5,7 +5,7 @@ from dictionary.models import Definition
 class MeaningRepo(object):
 
     def get_meanings_for_word(self, word):
-        orm_definitions = Definition.objects.filter(word=word)
+        orm_definitions = Definition.objects.filter(word=word, public=True)
 
         meanings = []
         for definition in orm_definitions:

@@ -10,8 +10,6 @@ class DictionaryView(object):
     def get(self):
         words = list(Definition.objects.values('word').order_by('word'))
         for word in words:
-            print(word)
-            print(type(word))
             word['uri'] = self.navigator.get_word_uri(word['word'])
 
         body = list(words)
