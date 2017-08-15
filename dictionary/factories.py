@@ -1,6 +1,6 @@
 from dictionary.repositories import WordRepo
 from dictionary.navigators import Navigator
-from dictionary.views import DictionaryView, WordView
+from dictionary.views import AllWordsView, WordView
 
 
 class WordRepoFactory(object):
@@ -26,10 +26,10 @@ class WordViewFactory(object):
         return WordView(word_repo=word_repo, navigator=navigator)
 
 
-class DictionaryViewFactory(object):
+class AllWordsViewFactory(object):
 
     @staticmethod
     def create(request):
         word_repo = WordRepoFactory.get()
         navigator = NavigatorFactory.get(request)
-        return DictionaryView(word_repo=word_repo, navigator=navigator)
+        return AllWordsView(word_repo=word_repo, navigator=navigator)

@@ -1,7 +1,7 @@
 from dictionary.serializers import MeaningSerializer
 
 
-class DictionaryView(object):
+class AllWordsView(object):
 
     def __init__(self, word_repo, navigator):
         self.word_repo = word_repo
