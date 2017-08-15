@@ -1,13 +1,13 @@
-from dictionary.repositories import MeaningRepo
+from dictionary.repositories import WordRepo
 from dictionary.navigators import Navigator
 from dictionary.views import DictionaryView, WordView
 
 
-class MeaningRepoFactory(object):
+class WordRepoFactory(object):
 
     @staticmethod
     def get():
-        return MeaningRepo()
+        return WordRepo()
 
 
 class NavigatorFactory(object):
@@ -21,14 +21,15 @@ class WordViewFactory(object):
 
     @staticmethod
     def create(request):
-        meaning_repo = MeaningRepoFactory.get()
+        word_repo = WordRepoFactory.get()
         navigator = NavigatorFactory.get(request)
-        return WordView(meaning_repo=meaning_repo, navigator=navigator)
+        return WordView(word_repo=word_repo, navigator=navigator)
 
 
 class DictionaryViewFactory(object):
 
     @staticmethod
     def create(request):
+        word_repo = WordRepoFactory.get()
         navigator = NavigatorFactory.get(request)
-        return DictionaryView(navigator=navigator)
+        return DictionaryView(word_repo=word_repo, navigator=navigator)

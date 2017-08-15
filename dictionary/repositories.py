@@ -2,7 +2,11 @@ from dictionary.entities import Meaning
 from dictionary.models import Definition
 
 
-class MeaningRepo(object):
+class WordRepo(object):
+
+    def get_all_words(self):
+        words_queryset = Definition.objects.filter(public=True).values('word').order_by('word').distinct()
+        return [word['word'] for word in words_queryset]
 
     def get_meanings_for_word(self, word):
         orm_definitions = Definition.objects.filter(word=word, public=True)
