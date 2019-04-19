@@ -52,22 +52,8 @@ class WordViewTestCase(TestCase):
                                'type': 'ty',
                                'description': 'desc',
                                'extra_info': 'e_i',
-                               'synonym_words': [
-                                   {
-                                       'word': 'a',
-                                   },
-                                   {
-                                       'word': 'b',
-                                   },
-                               ],
-                               'related_words': [
-                                   {
-                                       'word': 'c',
-                                   },
-                                   {
-                                       'word': 'd',
-                                   },
-                               ],
+                               'synonym_words': ['a', 'b'],
+                               'related_words': ['c', 'd']
                            },
                            {
                                'scientific': 'lorem',

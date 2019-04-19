@@ -7,8 +7,8 @@ class MeaningSerializer(object):
             'type': meaning.type,
             'description': meaning.description,
             'extra_info': meaning.extra_info,
-            'synonym_words': [{'word': word} for word in meaning.synonym_words],
-            'related_words': [{'word': word} for word in meaning.related_words]
+            'synonym_words': meaning.synonym_words,
+            'related_words': meaning.related_words
         }
 
     @staticmethod
