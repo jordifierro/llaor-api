@@ -11,40 +11,41 @@ from dictionary.models import Definition
 class AllWordsViewTestCase(TestCase):
 
     def test_returns_list_of_word_with_uri_and_200(self):
-        Definition.objects.create(word="word_a", meaning="any", semantic_group=1,
-                                  source="test data", public=True)
-        Definition.objects.create(word="word_b", meaning="any", semantic_group=1,
-                                  source="test data", public=True)
+        AllWordsViewTestCase.TestScenario() \
+            .given_a_definition(word="word_a", meaning="any",
+                                semantic_group=1, source="test data", public=True) \
+            .given_a_definition(word="word_b", meaning="any", semantic_group=1,
+                                source="test data", public=True) \
+            .when_get_words() \
+            .then_should_response(200, [{'word': 'word_a'}, {'word': 'word_b'}])
+    
+    class TestScenario:
 
-        response = Client().get(reverse('words'))
+        def given_a_definition(self, word, meaning, semantic_group, source, public):
+            Definition.objects.create(word=word, meaning=meaning, semantic_group=semantic_group,
+                                      source=source, public=public)
+            return self
+            
+        def when_get_words(self):
+            self.response = Client().get(reverse('words'))
+            return self
 
-        assert response.status_code == 200
-        body = json.loads(response.content)
-        assert body == [
-                           {
-                               'word': 'word_a',
-                           },
-                           {
-                               'word': 'word_b',
-                           },
-                       ]
-
-        Definition.objects.all().delete()
+        def then_should_response(self, status, body):
+            assert self.response.status_code == status
+            assert json.loads(self.response.content) == body
+            return self
 
 
 class WordViewTestCase(TestCase):
 
     def test_returns_list_of_word_meanings_and_200(self):
-        Definition.objects.create(word="target", scientific="sc", type="ty", meaning="desc",
-                                  extra_info="e_i", synonyms="a, b", related="c, d")
-        Definition.objects.create(word="target", scientific="lorem", type="noun", meaning="word meaning",
-                                  extra_info="none")
-
-        response = Client().get(reverse('word', kwargs={'word': 'target'}))
-
-        assert response.status_code == 200
-        body = json.loads(response.content)
-        assert body == [
+        WordViewTestCase.TestScenario() \
+                .given_a_definition(word="target", scientific="sc", type="ty", meaning="desc",
+                                    extra_info="e_i", synonyms="a, b", related="c, d") \
+                .given_a_definition(word="target", scientific="lorem", type="noun",
+                                    meaning="word meaning", extra_info="none") \
+                .when_get_word('target') \
+                .then_should_response(200, [
                            {
                                'scientific': 'sc',
                                'type': 'ty',
@@ -75,6 +76,22 @@ class WordViewTestCase(TestCase):
                                'synonym_words': [],
                                'related_words': [],
                            },
-                       ]
+                       ])
+    
 
-        Definition.objects.all().delete()
+    class TestScenario:
+
+        def given_a_definition(self, word, scientific, type, meaning, extra_info, synonyms="", related=""):
+            Definition.objects.create(word=word, scientific=scientific, type=type,
+                                      meaning=meaning, extra_info=extra_info,
+                                      synonyms=synonyms, related=related)
+            return self
+            
+        def when_get_word(self, word):
+            self.response = Client().get(reverse('word', kwargs={'word': word}))
+            return self
+
+        def then_should_response(self, status, body):
+            assert self.response.status_code == status
+            assert json.loads(self.response.content) == body
+            return self
