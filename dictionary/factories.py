@@ -3,33 +3,17 @@ from dictionary.navigators import Navigator
 from dictionary.views import AllWordsView, WordView
 
 
-class WordRepoFactory(object):
-
-    @staticmethod
-    def get():
-        return WordRepo()
+def create_word_repo():
+    return WordRepo()
 
 
-class NavigatorFactory(object):
-
-    @staticmethod
-    def get(request):
-        return Navigator(request)
+def create_navigator(request):
+    return Navigator(request)
 
 
-class WordViewFactory(object):
-
-    @staticmethod
-    def create(request):
-        word_repo = WordRepoFactory.get()
-        navigator = NavigatorFactory.get(request)
-        return WordView(word_repo=word_repo, navigator=navigator)
+def create_word_view(request):
+    return WordView(word_repo=create_word_repo(), navigator=create_navigator(request))
 
 
-class AllWordsViewFactory(object):
-
-    @staticmethod
-    def create(request):
-        word_repo = WordRepoFactory.get()
-        navigator = NavigatorFactory.get(request)
-        return AllWordsView(word_repo=word_repo, navigator=navigator)
+def create_all_words_view(request):
+    return AllWordsView(word_repo=create_word_repo(), navigator=create_navigator(request))

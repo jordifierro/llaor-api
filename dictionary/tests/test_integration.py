@@ -21,18 +21,18 @@ class AllWordsViewTestCase(TestCase):
             return "full-uri{}".format(x)
         get_full_uri.side_effect = fake_full_uri
 
-        response = Client().get(reverse('words-list'))
+        response = Client().get(reverse('words'))
 
         assert response.status_code == 200
         body = json.loads(response.content)
         assert body == [
                            {
                                'word': 'word_a',
-                               'uri': 'full-uri{}word_a'.format(reverse('words-list'))
+                               'uri': 'full-uri{}word_a'.format(reverse('words'))
                            },
                            {
                                'word': 'word_b',
-                               'uri': 'full-uri{}word_b'.format(reverse('words-list'))
+                               'uri': 'full-uri{}word_b'.format(reverse('words'))
                            },
                        ]
 
@@ -65,21 +65,21 @@ class WordViewTestCase(TestCase):
                                'synonym_words': [
                                    {
                                        'word': 'a',
-                                       'uri': 'full-uri{}a'.format(reverse('words-list'))
+                                       'uri': 'full-uri{}a'.format(reverse('words'))
                                    },
                                    {
                                        'word': 'b',
-                                       'uri': 'full-uri{}b'.format(reverse('words-list'))
+                                       'uri': 'full-uri{}b'.format(reverse('words'))
                                    },
                                ],
                                'related_words': [
                                    {
                                        'word': 'c',
-                                       'uri': 'full-uri{}c'.format(reverse('words-list'))
+                                       'uri': 'full-uri{}c'.format(reverse('words'))
                                    },
                                    {
                                        'word': 'd',
-                                       'uri': 'full-uri{}d'.format(reverse('words-list'))
+                                       'uri': 'full-uri{}d'.format(reverse('words'))
                                    },
                                ],
                            },
