@@ -45,7 +45,8 @@ class WordViewTestCase(TestCase):
                 .given_a_definition(word="target", scientific="lorem", type="noun",
                                     meaning="word meaning", extra_info="none") \
                 .when_get_word('target') \
-                .then_should_response(200, [
+                .then_should_response(200, {'word': 'target',
+                    'meanings': [
                            {
                                'scientific': 'sc',
                                'type': 'ty',
@@ -76,7 +77,7 @@ class WordViewTestCase(TestCase):
                                'synonym_words': [],
                                'related_words': [],
                            },
-                       ])
+                       ]})
     
 
     class TestScenario:

@@ -41,7 +41,8 @@ class TestWordView(object):
                 .given_a_word_repo_that_returns([meaning_a, meaning_b]) \
                 .when_get_word_view("Test") \
                 .then_should_call_repo_get_meanings_for_word("Test") \
-                .then_should_response(200, [
+                .then_should_response(200, {'word': 'Test', 
+                    'meanings': [
                            {
                                'scientific': 'sc',
                                'type': 'ty',
@@ -72,7 +73,7 @@ class TestWordView(object):
                                'synonym_words': [],
                                'related_words': [],
                            },
-                       ])
+                       ]})
 
 
     class TestScenario:

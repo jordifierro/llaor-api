@@ -12,5 +12,6 @@ class MeaningSerializer(object):
         }
 
     @staticmethod
-    def serialize_multiple(meanings):
-        return [MeaningSerializer.serialize(meaning) for meaning in meanings]
+    def serialize_multiple(word, meanings):
+        return {'word': word,
+                'meanings': [MeaningSerializer.serialize(meaning) for meaning in meanings]}

@@ -20,6 +20,6 @@ class WordView(object):
     def get(self, word):
         meanings = self.word_repo.get_meanings_for_word(word)
 
-        body = MeaningSerializer.serialize_multiple(meanings)
+        body = MeaningSerializer.serialize_multiple(word, meanings)
         status = 200
         return body, status
