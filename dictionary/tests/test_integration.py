@@ -17,7 +17,7 @@ class AllWordsViewTestCase(TestCase):
             .given_a_definition(word="word_b", meaning="any", semantic_group=1,
                                 source="test data", public=True) \
             .when_get_words() \
-            .then_should_response(200, [{'word': 'word_a'}, {'word': 'word_b'}])
+            .then_should_response(200, ['word_a', 'word_b'])
     
     class TestScenario:
 

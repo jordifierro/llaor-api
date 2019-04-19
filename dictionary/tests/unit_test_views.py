@@ -10,7 +10,7 @@ class TestAllWordsView(object):
         TestAllWordsView.TestScenario() \
                 .given_a_word_repo_that_returns(["word_a", "word_b"]) \
                 .when_get_all_words_view() \
-                .then_should_response(200, [{'word': 'word_a'}, {'word': 'word_b'}])
+                .then_should_response(200, ['word_a', 'word_b'])
 
     class TestScenario:
 
