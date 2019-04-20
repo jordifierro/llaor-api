@@ -83,8 +83,8 @@ if LOCAL_DEPLOY:
             'NAME': os.environ['DATABASE_NAME'],
             'USER': os.environ['DATABASE_USER'],
             'PASSWORD': os.environ['DATABASE_PASS'],
-            'HOST': '',
-            'PORT': '',
+            'HOST': os.environ['DATABASE_HOST'],
+            'PORT': os.environ['DATABASE_PORT']
         }
     }
 else:
