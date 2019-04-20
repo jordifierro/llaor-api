@@ -5,6 +5,8 @@ services:
     image: postgres
     expose:
         - "5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
   api:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
@@ -18,3 +20,5 @@ services:
         - "8000:8000"
     depends_on:
         - db
+volumes:
+  pgdata:
