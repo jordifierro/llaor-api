@@ -31,3 +31,24 @@ class Meaning(object):
     @property
     def related_words(self):
         return self._related_words
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
+
+class Word(object):
+
+    def __init__(self, word, meanings):
+        self._word = word
+        self._meanings = meanings
+
+    @property
+    def word(self):
+        return self._word
+
+    @property
+    def meanings(self):
+        return self._meanings
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__

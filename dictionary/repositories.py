@@ -1,4 +1,4 @@
-from dictionary.entities import Meaning
+from dictionary.entities import Meaning, Word
 from dictionary.models import Definition
 
 
@@ -8,7 +8,7 @@ class WordRepo(object):
         words_queryset = Definition.objects.filter(public=True).values('word').order_by('word').distinct()
         return [word['word'] for word in words_queryset]
 
-    def get_meanings_for_word(self, word):
+    def get_word(self, word):
         orm_definitions = Definition.objects.filter(word=word, public=True)
 
         meanings = []
@@ -21,4 +21,4 @@ class WordRepo(object):
                               related_words=definition.related.split(', ') if definition.related else [])
             meanings.append(meaning)
 
-        return meanings
+        return Word(word, meanings)

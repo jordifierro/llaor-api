@@ -2,36 +2,37 @@ from django.test import TestCase
 
 from dictionary.repositories import WordRepo
 from dictionary.models import Definition
+from dictionary.entities import Word
 
 
-class GetMeaningsForWordTestCase(TestCase):
+class GetForWordTestCase(TestCase):
 
     def test_no_meanings_returns_empty_list(self):
-        GetMeaningsForWordTestCase.ScenarioMaker() \
+        GetForWordTestCase.ScenarioMaker() \
                 .given_a_word() \
                 .given_no_meanings() \
-                .when_get_meanings_for_the_word() \
+                .when_get_word() \
                 .then_an_empty_list_should_be_returned()
 
     def test_meaning_is_correctly_parsed(self):
-        GetMeaningsForWordTestCase.ScenarioMaker() \
+        GetForWordTestCase.ScenarioMaker() \
                 .given_a_word() \
                 .given_a_meaning_for_that_word() \
-                .when_get_meanings_for_the_word() \
+                .when_get_word() \
                 .then_meaning_should_be_correctly_parsed()
 
     def test_private_meaning_should_not_be_returned(self):
-        GetMeaningsForWordTestCase.ScenarioMaker() \
+        GetForWordTestCase.ScenarioMaker() \
                 .given_a_word() \
                 .given_a_meaning_for_that_word(public=False) \
-                .when_get_meanings_for_the_word() \
+                .when_get_word() \
                 .then_an_empty_list_should_be_returned()
 
     def test_two_meanings_should_be_returned_sorted_by_semantic_group(self):
-        GetMeaningsForWordTestCase.ScenarioMaker() \
+        GetForWordTestCase.ScenarioMaker() \
                 .given_a_word() \
                 .given_two_meanings_for_that_word() \
-                .when_get_meanings_for_the_word() \
+                .when_get_word() \
                 .then_both_should_be_retrieved_in_proper_order()
 
     class ScenarioMaker(object):
@@ -81,27 +82,29 @@ class GetMeaningsForWordTestCase(TestCase):
 
             return self
 
-        def when_get_meanings_for_the_word(self):
-            self.response = WordRepo().get_meanings_for_word(self.word)
+        def when_get_word(self):
+            self.response = WordRepo().get_word(self.word)
 
             return self
 
         def then_an_empty_list_should_be_returned(self):
-            assert self.response == []
+            assert self.response == Word(self.word, [])
 
             return self
 
         def then_meaning_should_be_correctly_parsed(self):
+            assert self.response.word == self.word
             self._assert_orm_definition_and_meaning_are_equal(orm_definition=self.orm_definition,
-                                                              meaning=self.response[0])
+                                                              meaning=self.response.meanings[0])
 
             return self
 
         def then_both_should_be_retrieved_in_proper_order(self):
+            assert self.response.word == self.word
             self._assert_orm_definition_and_meaning_are_equal(orm_definition=self.orm_definition,
-                                                              meaning=self.response[0])
+                                                              meaning=self.response.meanings[0])
             self._assert_orm_definition_and_meaning_are_equal(orm_definition=self.orm_definition_2,
-                                                              meaning=self.response[1])
+                                                              meaning=self.response.meanings[1])
 
             return self
 
