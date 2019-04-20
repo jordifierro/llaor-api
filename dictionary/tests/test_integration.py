@@ -12,18 +12,50 @@ class AllWordsViewTestCase(TestCase):
 
     def test_returns_list_of_word_with_uri_and_200(self):
         AllWordsViewTestCase.TestScenario() \
-            .given_a_definition(word="word_a", meaning="any",
-                                semantic_group=1, source="test data", public=True) \
-            .given_a_definition(word="word_b", meaning="any", semantic_group=1,
-                                source="test data", public=True) \
+            .given_a_definition(word="word_a", scientific="s", type="t", meaning="any",
+                                extra_info="x", semantic_group=1, source="test data",
+                                synonyms="a, b", related="x, z", public=True) \
+            .given_a_definition(word="word_b", scientific="s", type="t", meaning="other",
+                                extra_info="x", semantic_group=1, source="test data",
+                                synonyms="a, b", related="x, z", public=True) \
             .when_get_words() \
-            .then_should_response(200, ['word_a', 'word_b'])
+            .then_should_response(200, [
+                {
+                    'word': 'word_a',
+                    'meanings': [
+                        {
+                            'scientific': 's',
+                            'type': 't',
+                            'description': 'any',
+                            'extra_info': 'x',
+                            'synonym_words': ['a', 'b'],
+                            'related_words': ['x', 'z']
+                        }
+                    ]
+                },
+                {
+                    'word': 'word_b',
+                    'meanings': [
+                        {
+                            'scientific': 's',
+                            'type': 't',
+                            'description': 'other',
+                            'extra_info': 'x',
+                            'synonym_words': ['a', 'b'],
+                            'related_words': ['x', 'z']
+                        }
+                    ]
+                }
+            ])
     
     class TestScenario:
 
-        def given_a_definition(self, word, meaning, semantic_group, source, public):
-            Definition.objects.create(word=word, meaning=meaning, semantic_group=semantic_group,
-                                      source=source, public=public)
+        def given_a_definition(self, word, scientific, type, meaning, extra_info,
+                               semantic_group, source, synonyms, related, public):
+            Definition.objects.create(word=word, scientific=scientific, type=type,
+                                      meaning=meaning, extra_info=extra_info, 
+                                      semantic_group=semantic_group, source=source,
+                                      synonyms=synonyms, related=related, public=public)
             return self
             
         def when_get_words(self):

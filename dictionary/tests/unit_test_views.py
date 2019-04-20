@@ -8,9 +8,53 @@ class TestAllWordsView(object):
 
     def test_returns_list_of_word_with_uri_and_200(self):
         TestAllWordsView.TestScenario() \
-                .given_a_word_repo_that_returns(["word_a", "word_b"]) \
+                .given_a_word_repo_that_returns([
+                    Word(word='word_a', meanings=[
+                        Meaning('s', 't', 'one', 'x', ['a', 'b 2'], ['c 1', 'b 2']),
+                        Meaning('r', 'u', 'two', 'y', ['x', 'b2'], ['c1', 'w2'])
+                    ]),
+                    Word(word='word_b', meanings=[
+                        Meaning('s', 'q', 'new', 'o', ['x', 'b2'], ['c1', 'w2'])
+                    ]),
+                ]) \
                 .when_get_all_words_view() \
-                .then_should_response(200, ['word_a', 'word_b'])
+                .then_should_response(200, [
+                    {
+                        'word': 'word_a',
+                        'meanings': [
+                            {
+                                'scientific': 's',
+                                'type': 't',
+                                'description': 'one',
+                                'extra_info': 'x',
+                                'synonym_words': ['a', 'b 2'],
+                                'related_words': ['c 1', 'b 2']
+                            },
+                            {
+                                'scientific': 'r',
+                                'type': 'u',
+                                'description': 'two',
+                                'extra_info': 'y',
+                                'synonym_words': ['x', 'b2'],
+                                'related_words': ['c1', 'w2']
+                            }
+                        ]
+                    },
+                    {
+                        'word': 'word_b',
+                        'meanings': [
+                            {
+                                'scientific': 's',
+                                'type': 'q',
+                                'description': 'new',
+                                'extra_info': 'o',
+                                'synonym_words': ['x', 'b2'],
+                                'related_words': ['c1', 'w2']
+                            },
+                        ]
+                    },
+                ])
+
 
     class TestScenario:
 

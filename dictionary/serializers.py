@@ -15,3 +15,7 @@ class MeaningSerializer(object):
     def serialize_word(word):
         return {'word': word.word,
                 'meanings': [MeaningSerializer.serialize(meaning) for meaning in word.meanings]}
+
+    @staticmethod
+    def serialize_words(words):
+        return [MeaningSerializer.serialize_word(word) for word in words]

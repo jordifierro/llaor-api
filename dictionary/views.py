@@ -7,7 +7,9 @@ class AllWordsView(object):
         self.word_repo = word_repo
 
     def get(self):
-        body = self.word_repo.get_all_words()
+        words = self.word_repo.get_all_words()
+
+        body = MeaningSerializer.serialize_words(words)
         status = 200
         return body, status
 

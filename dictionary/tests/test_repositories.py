@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from dictionary.repositories import WordRepo
 from dictionary.models import Definition
-from dictionary.entities import Word
+from dictionary.entities import Word, Meaning
 
 
 class GetForWordTestCase(TestCase):
@@ -119,82 +119,37 @@ class GetForWordTestCase(TestCase):
 
 class GetAllWordsTestCase(TestCase):
 
-    def test_word_with_no_meanings_returns_empty_list(self):
+    def test_returns_words_with_their_meanings(self):
         GetAllWordsTestCase.ScenarioMaker() \
-                .given_a_word() \
-                .given_no_meanings() \
+                .given_a_definition(word='word_a', scientific='s', type='t', meaning='one',
+                                 extra_info='x', synonyms="a, b 2", related="c 1, b 2", public=True) \
+                .given_a_definition(word='word_a', scientific='r', type='u', meaning='two',
+                                 extra_info='y', synonyms="x, b2", related="c1, w2", public=True) \
+                .given_a_definition(word='word_b', scientific='s', type='q', meaning='new',
+                                 extra_info='o', synonyms="x, b2", related="c1, w2", public=True) \
                 .when_get_all_words() \
-                .then_an_empty_list_should_be_returned()
-
-    def test_word_with_multiple_meanings_returns_word(self):
-        GetAllWordsTestCase.ScenarioMaker() \
-                .given_a_word() \
-                .given_multiple_meanings_for_each_word() \
-                .when_get_all_words() \
-                .then_word_should_be_returned()
-
-    def test_multiple_words_sorts_them_alphabetically(self):
-        GetAllWordsTestCase.ScenarioMaker() \
-                .given_multiple_words() \
-                .given_multiple_meanings_for_each_word() \
-                .when_get_all_words() \
-                .then_response_should_retrieve_words_sorted_alphabetically()
+                .then_should_return([
+                    Word(word='word_a', meanings=[
+                        Meaning('s', 't', 'one', 'x', ['a', 'b 2'], ['c 1', 'b 2']),
+                        Meaning('r', 'u', 'two', 'y', ['x', 'b2'], ['c1', 'w2'])
+                    ]),
+                    Word(word='word_b', meanings=[
+                        Meaning('s', 'q', 'new', 'o', ['x', 'b2'], ['c1', 'w2'])
+                    ]),
+                ])
 
     class ScenarioMaker(object):
 
-        def __init__(self):
-            self.words = None
-            self.response = None
-
-        def given_a_word(self):
-            self.words = ["sample"]
-
-            return self
-
-        def given_multiple_words(self):
-            self.words = ["sample", "abc"]
-
-            return self
-
-        def given_no_meanings(self):
-            return self
-
-        def given_multiple_meanings_for_each_word(self):
-            for word in self.words:
-                Definition.objects.create(word=word, phonetic="ph", scientific="lorem",
-                                          type="noun", meaning="A small part",
-                                          extra_info="Typical word",
-                                          private_notes="secret", synonyms="taste, specimen",
-                                          related="data, analysis", origin="england",
-                                          semantic_field="statistics", semantic_group=1,
-                                          source="test data", reviewed=True, public=True)
-
-                Definition.objects.create(word=word, phonetic="zh", scientific="ipsum",
-                                          type="verb", meaning="Take a sample",
-                                          extra_info="Non typical word",
-                                          private_notes="secret", synonyms="try, test",
-                                          related="data, analysis", origin="england",
-                                          semantic_field="statistics", semantic_group=2,
-                                          source="test data", reviewed=True, public=True)
-
+        def given_a_definition(self, word, scientific, type, meaning,
+                               extra_info, synonyms, related, public):
+            Definition.objects.create(word=word, scientific=scientific, type=type, meaning=meaning,
+                                      extra_info=extra_info, synonyms=synonyms, related=related, public=public)
             return self
 
         def when_get_all_words(self):
             self.response = WordRepo().get_all_words()
-
             return self
 
-        def then_an_empty_list_should_be_returned(self):
-            assert self.response == []
-
-            return self
-
-        def then_word_should_be_returned(self):
-            assert self.words == self.response
-
-            return self
-
-        def then_response_should_retrieve_words_sorted_alphabetically(self):
-            assert sorted(self.words) == self.response
-
+        def then_should_return(self, response):
+            assert self.response == response
             return self
