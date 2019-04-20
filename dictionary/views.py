@@ -1,4 +1,4 @@
-from dictionary.serializers import MeaningSerializer
+from dictionary.serializers import serialize_word, serialize_words
 
 
 class AllWordsView(object):
@@ -9,7 +9,7 @@ class AllWordsView(object):
     def get(self):
         words = self.word_repo.get_all_words()
 
-        body = MeaningSerializer.serialize_words(words)
+        body = serialize_words(words)
         status = 200
         return body, status
 
@@ -22,6 +22,6 @@ class WordView(object):
     def get(self, word):
         word_with_meanings = self.word_repo.get_word(word)
 
-        body = MeaningSerializer.serialize_word(word_with_meanings)
+        body = serialize_word(word_with_meanings)
         status = 200
         return body, status
