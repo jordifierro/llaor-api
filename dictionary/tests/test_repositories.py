@@ -1,5 +1,9 @@
+from elasticsearch.exceptions import NotFoundError
+import logging
+
 from django.test import TestCase
 
+from dictionary.factories import create_word_search_repo
 from dictionary.repositories import WordRepo
 from dictionary.models import Definition
 from dictionary.entities import Word, Meaning
@@ -152,4 +156,51 @@ class GetAllWordsTestCase(TestCase):
 
         def then_should_return(self, response):
             assert self.response == response
+            return self
+
+
+class WordSearchRepoTestCase(TestCase):
+
+    def test_search_by_first_letter(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(Word('a', [])) \
+                .given_a_word(Word('ahola', [])) \
+                .given_a_word(Word('adeu', [])) \
+                .given_a_word(Word('baaa', [])) \
+                .given_a_word(Word('xyz', [])) \
+                .when_index_everything_and_search_by_first_letter('a') \
+                .then_should_return(['a', 'adeu', 'ahola'])
+
+    def test_search_by_first_letter_with_no_matches(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(Word('baaa', [])) \
+                .given_a_word(Word('xyz', [])) \
+                .when_index_everything_and_search_by_first_letter('a') \
+                .then_should_return([])
+
+    class TestScenario:
+
+        def __init__(self):
+            self.repo = create_word_search_repo()
+            try:
+                self.repo._delete_word_index()
+            except NotFoundError:
+                pass
+            self.repo._create_word_index()
+            self.words = []
+            logging.getLogger('elasticsearch').setLevel(logging.ERROR)
+
+        def given_a_word(self, word):
+            self.words.append(word)
+            return self
+
+        def when_index_everything_and_search_by_first_letter(self, first_letter):
+            for word in self.words:
+                self.repo.index_word(word)
+            self.repo._refresh_word_index()
+            self.result = self.repo.search_words_by_first_letter(first_letter)
+            return self
+
+        def then_should_return(self, result):
+            assert self.result == result
             return self

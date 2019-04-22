@@ -138,3 +138,5 @@ STATICFILES_DIRS = (os.path.join(PROJECT_ROOT, 'static'), )
 # https://warehouse.python.org/project/whitenoise/
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+ELASTICSEARCH_URL = os.environ['ELASTICSEARCH_URL']
