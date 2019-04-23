@@ -1,27 +1,27 @@
 import itertools
 from elasticsearch import NotFoundError as ElasticSearchNotFoundError
 
-from dictionary.entities import Meaning, Word
+from dictionary.entities import Meaning, WordMeanings
 from dictionary.models import Definition
 
 
 class WordRepo(object):
 
-    def get_all_words(self):
+    def get_all_words_meanings(self):
         definitions = Definition.objects.filter(public=True).order_by('word')
 
         words = []
         for key, group in itertools.groupby(definitions, key=lambda x:x.word):
-            words.append(Word(key, [self.parse_meaning(definition) for definition in group]))
+            words.append(WordMeanings(key, [self.parse_meaning(definition) for definition in group]))
 
         return words
 
-    def get_word(self, word):
+    def get_word_meanings(self, word):
         orm_definitions = Definition.objects.filter(word=word, public=True)
 
         meanings = [self.parse_meaning(orm_definition) for orm_definition in orm_definitions]
 
-        return Word(word, meanings)
+        return WordMeanings(word, meanings)
 
     def parse_meaning(self, orm_definition):
         return Meaning(scientific=orm_definition.scientific,
@@ -66,13 +66,13 @@ class WordSearchRepo(object):
     def _delete_word_index(self):
         self.elastic_client.indices.delete(index=WordSearchRepo.WORD_INDEX)
 
-    def index_word(self, word):
+    def index_word(self, word_meanings):
         doc = {
-                'word': word.word,
+                'word': word_meanings.word,
               }
         self.elastic_client.index(index=WordSearchRepo.WORD_INDEX,
                                   doc_type=WordSearchRepo.WORD_DOC_TYPE,
-                                  body=doc, id=word.word)
+                                  body=doc, id=word_meanings.word)
 
     def delete_word(self, word_word):
         try:

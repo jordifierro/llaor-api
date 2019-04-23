@@ -1,7 +1,7 @@
 from mock import Mock
 
 from dictionary.views import AllWordsView, WordView
-from dictionary.entities import Meaning, Word
+from dictionary.entities import Meaning, WordMeanings
 
 
 class TestAllWordsView(object):
@@ -9,11 +9,11 @@ class TestAllWordsView(object):
     def test_returns_list_of_word_with_uri_and_200(self):
         TestAllWordsView.TestScenario() \
                 .given_a_word_repo_that_returns([
-                    Word(word='word_a', meanings=[
+                    WordMeanings(word='word_a', meanings=[
                         Meaning('s', 't', 'one', 'x', ['a', 'b 2'], ['c 1', 'b 2']),
                         Meaning('r', 'u', 'two', 'y', ['x', 'b2'], ['c1', 'w2'])
                     ]),
-                    Word(word='word_b', meanings=[
+                    WordMeanings(word='word_b', meanings=[
                         Meaning('s', 'q', 'new', 'o', ['x', 'b2'], ['c1', 'w2'])
                     ]),
                 ]) \
@@ -60,7 +60,7 @@ class TestAllWordsView(object):
 
         def given_a_word_repo_that_returns(self, words):
             self.word_repo_mock = Mock()
-            self.word_repo_mock.get_all_words.return_value = words
+            self.word_repo_mock.get_all_words_meanings.return_value = words
             return self
 
         def when_get_all_words_view(self):
@@ -82,7 +82,7 @@ class TestWordView(object):
                             synonym_words=[], related_words=[])
 
         TestWordView.TestScenario() \
-                .given_a_word_repo_that_returns(Word("Test", [meaning_a, meaning_b])) \
+                .given_a_word_repo_that_returns(WordMeanings("Test", [meaning_a, meaning_b])) \
                 .when_get_word_view("Test") \
                 .then_should_call_repo_get_meanings_for_word("Test") \
                 .then_should_response(200, {'word': 'Test', 
@@ -108,9 +108,9 @@ class TestWordView(object):
 
     class TestScenario:
 
-        def given_a_word_repo_that_returns(self, word):
+        def given_a_word_repo_that_returns(self, word_meanings):
             self.word_repo_mock = Mock()
-            self.word_repo_mock.get_word.return_value = word
+            self.word_repo_mock.get_word_meanings.return_value = word_meanings
             return self
 
         def when_get_word_view(self, word):
@@ -118,7 +118,7 @@ class TestWordView(object):
             return self
 
         def then_should_call_repo_get_meanings_for_word(self, word):
-            self.word_repo_mock.get_word.assert_called_once_with(word)
+            self.word_repo_mock.get_word_meanings.assert_called_once_with(word)
             return self
 
         def then_should_response(self, status, body):

@@ -6,7 +6,7 @@ from django.test import TestCase
 from dictionary.factories import create_word_search_repo
 from dictionary.repositories import WordRepo
 from dictionary.models import Definition
-from dictionary.entities import Word, Meaning
+from dictionary.entities import WordMeanings, Meaning
 
 
 class GetForWordTestCase(TestCase):
@@ -87,12 +87,12 @@ class GetForWordTestCase(TestCase):
             return self
 
         def when_get_word(self):
-            self.response = WordRepo().get_word(self.word)
+            self.response = WordRepo().get_word_meanings(self.word)
 
             return self
 
         def then_an_empty_list_should_be_returned(self):
-            assert self.response == Word(self.word, [])
+            assert self.response == WordMeanings(self.word, [])
 
             return self
 
@@ -133,11 +133,11 @@ class GetAllWordsTestCase(TestCase):
                                  extra_info='o', synonyms="x, b2", related="c1, w2", public=True) \
                 .when_get_all_words() \
                 .then_should_return([
-                    Word(word='word_a', meanings=[
+                    WordMeanings(word='word_a', meanings=[
                         Meaning('s', 't', 'one', 'x', ['a', 'b 2'], ['c 1', 'b 2']),
                         Meaning('r', 'u', 'two', 'y', ['x', 'b2'], ['c1', 'w2'])
                     ]),
-                    Word(word='word_b', meanings=[
+                    WordMeanings(word='word_b', meanings=[
                         Meaning('s', 'q', 'new', 'o', ['x', 'b2'], ['c1', 'w2'])
                     ]),
                 ])
@@ -151,7 +151,7 @@ class GetAllWordsTestCase(TestCase):
             return self
 
         def when_get_all_words(self):
-            self.response = WordRepo().get_all_words()
+            self.response = WordRepo().get_all_words_meanings()
             return self
 
         def then_should_return(self, response):
@@ -163,18 +163,18 @@ class WordSearchRepoTestCase(TestCase):
 
     def test_search_by_first_letter(self):
         WordSearchRepoTestCase.TestScenario() \
-                .given_a_word(Word('a', [])) \
-                .given_a_word(Word('ahola', [])) \
-                .given_a_word(Word('adeu', [])) \
-                .given_a_word(Word('baaa', [])) \
-                .given_a_word(Word('xyz', [])) \
+                .given_a_word(WordMeanings('a', [])) \
+                .given_a_word(WordMeanings('ahola', [])) \
+                .given_a_word(WordMeanings('adeu', [])) \
+                .given_a_word(WordMeanings('baaa', [])) \
+                .given_a_word(WordMeanings('xyz', [])) \
                 .when_index_everything_and_search_by_first_letter('a') \
                 .then_should_return(['a', 'adeu', 'ahola'])
 
     def test_search_by_first_letter_with_no_matches(self):
         WordSearchRepoTestCase.TestScenario() \
-                .given_a_word(Word('baaa', [])) \
-                .given_a_word(Word('xyz', [])) \
+                .given_a_word(WordMeanings('baaa', [])) \
+                .given_a_word(WordMeanings('xyz', [])) \
                 .when_index_everything_and_search_by_first_letter('a') \
                 .then_should_return([])
 

@@ -36,7 +36,7 @@ class Meaning(object):
         return self.__dict__ == other.__dict__
 
 
-class Word(object):
+class WordMeanings(object):
 
     def __init__(self, word, meanings):
         self._word = word

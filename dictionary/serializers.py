@@ -8,9 +8,9 @@ def serialize_meaning(meaning):
         'related_words': meaning.related_words
     }
 
-def serialize_word(word):
-    return {'word': word.word,
-            'meanings': [serialize_meaning(meaning) for meaning in word.meanings]}
+def serialize_word_meanings(word_meanings):
+    return {'word': word_meanings.word,
+            'meanings': [serialize_meaning(meaning) for meaning in word_meanings.meanings]}
 
-def serialize_words(words):
-    return [serialize_word(word) for word in words]
+def serialize_words_meanings(words_meanings):
+    return [serialize_word_meanings(word_meanings) for word_meanings in words_meanings]
