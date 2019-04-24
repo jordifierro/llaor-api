@@ -30,6 +30,18 @@ class WordRepo(object):
 
         return WordMeanings(word, meanings)
 
+    def get_words_meanings(self, words):
+        orm_definitions = Definition.objects.filter(word__in=words) \
+                                            .filter(public=True) \
+                                            .filter(reviewed=True)
+
+        words_meanings = []
+        for key, group in itertools.groupby(orm_definitions, key=lambda x:x.word):
+            meanings = [self.parse_meaning(definition) for definition in sorted(list(group), key=lambda x:x.semantic_group)]
+            words_meanings.append(WordMeanings(key, meanings))
+
+        return words_meanings
+
     def parse_meaning(self, orm_definition):
         return Meaning(scientific=orm_definition.scientific,
                        type=orm_definition.type,

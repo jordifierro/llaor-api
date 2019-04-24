@@ -104,7 +104,57 @@ class WordRepoTestCase(TestCase):
                                                                    synonym_words=["taste2", "specimen2"],
                                                                    related_words=["data2", "analysis2"])]))
 
-    def test_returns_words_with_their_meanings(self):
+    def test_two_meanings_should_be_returned_sorted_by_semantic_group(self):
+        WordRepoTestCase.TestScenario() \
+                .given_a_definition(word="piece", phonetic="ph2", scientific="lorem2", type="noun2",
+                                    meaning="A small part2", extra_info="Typical word2",
+                                    private_notes="secret2", synonyms="taste2, specimen2",
+                                    related="data2, analysis2", origin="england2",
+                                    semantic_field="statistics2", semantic_group=2,
+                                    source="test data", reviewed=True, public=True) \
+                .given_a_definition(word="piece", phonetic="ph", scientific="lorem", type="noun",
+                                    meaning="A small part", extra_info="Typical word",
+                                    private_notes="secret", synonyms="taste, specimen",
+                                    related="data, analysis", origin="england",
+                                    semantic_field="statistics", semantic_group=1,
+                                    source="test data", reviewed=True, public=True) \
+                .given_a_definition(word="loft", phonetic="ph2", scientific="lorem2", type="noun2",
+                                    meaning="A small part2", extra_info="Typical word2",
+                                    private_notes="secret2", synonyms="taste2, specimen2",
+                                    related="data2, analysis2", origin="england2",
+                                    semantic_field="statistics2", semantic_group=2,
+                                    source="test data", reviewed=True, public=True) \
+                .given_a_definition(word="loft", phonetic="ph", scientific="lorem", type="noun",
+                                    meaning="A small part", extra_info="Typical word",
+                                    private_notes="secret", synonyms="taste, specimen",
+                                    related="data, analysis", origin="england",
+                                    semantic_field="statistics", semantic_group=1,
+                                    source="test data", reviewed=True, public=True) \
+                .when_get_words_meanings(["piece", "loft"]) \
+                .then_should_return([WordMeanings(word="loft",
+                                                  meanings=[Meaning(scientific="lorem", type="noun",
+                                                                    description="A small part",
+                                                                    extra_info="Typical word",
+                                                                    synonym_words=["taste", "specimen"],
+                                                                    related_words=["data", "analysis"]),
+                                                            Meaning(scientific="lorem2", type="noun2",
+                                                                    description="A small part2",
+                                                                    extra_info="Typical word2",
+                                                                    synonym_words=["taste2", "specimen2"],
+                                                                    related_words=["data2", "analysis2"])]),
+                                     WordMeanings(word="piece",
+                                                  meanings=[Meaning(scientific="lorem", type="noun",
+                                                                    description="A small part",
+                                                                    extra_info="Typical word",
+                                                                    synonym_words=["taste", "specimen"],
+                                                                    related_words=["data", "analysis"]),
+                                                            Meaning(scientific="lorem2", type="noun2",
+                                                                    description="A small part2",
+                                                                    extra_info="Typical word2",
+                                                                    synonym_words=["taste2", "specimen2"],
+                                                                    related_words=["data2", "analysis2"])])])
+
+    def test_get_all_words_meanings(self):
         WordRepoTestCase.TestScenario() \
                 .given_a_definition(word='word_a', scientific='s', type='t', meaning='one',
                                     extra_info='x', synonyms="a, b 2", related="c 1, b 2", public=True) \
@@ -142,6 +192,10 @@ class WordRepoTestCase(TestCase):
             except Exception as e:
                 self.error = e
 
+            return self
+
+        def when_get_words_meanings(self, words):
+            self.response = WordRepo().get_words_meanings(words)
             return self
 
         def when_get_all_words(self):
