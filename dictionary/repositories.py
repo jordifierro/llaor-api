@@ -1,6 +1,7 @@
 import itertools
 from elasticsearch import NotFoundError as ElasticSearchNotFoundError
 
+from llaor.exceptions import EntityNotFoundException
 from dictionary.entities import Meaning, WordMeanings
 from dictionary.models import Definition
 
@@ -17,7 +18,13 @@ class WordRepo(object):
         return words
 
     def get_word_meanings(self, word):
-        orm_definitions = Definition.objects.filter(word=word, public=True)
+        orm_definitions = Definition.objects.filter(word=word) \
+                                            .filter(public=True) \
+                                            .filter(reviewed=True) \
+                                            .order_by('semantic_group')
+
+        if not orm_definitions:
+            raise EntityNotFoundException()
 
         meanings = [self.parse_meaning(orm_definition) for orm_definition in orm_definitions]
 

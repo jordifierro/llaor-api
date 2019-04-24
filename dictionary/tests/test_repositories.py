@@ -3,134 +3,115 @@ import logging
 
 from django.test import TestCase
 
+from llaor.exceptions import EntityNotFoundException
 from dictionary.factories import create_word_search_repo
 from dictionary.repositories import WordRepo
 from dictionary.models import Definition
 from dictionary.entities import WordMeanings, Meaning
 
 
-class GetForWordTestCase(TestCase):
+class WordRepoTestCase(TestCase):
 
-    def test_no_meanings_returns_empty_list(self):
-        GetForWordTestCase.ScenarioMaker() \
-                .given_a_word() \
-                .given_no_meanings() \
-                .when_get_word() \
-                .then_an_empty_list_should_be_returned()
+    def test_a_definition_returns_word_with_that_meaning(self):
+        WordRepoTestCase.TestScenario() \
+                .given_a_definition(word="piece", phonetic="ph", scientific="lorem", type="noun",
+                                    meaning="A small part", extra_info="Typical word",
+                                    private_notes="secret", synonyms="taste, specimen",
+                                    related="data, analysis", origin="england",
+                                    semantic_field="statistics", semantic_group=1,
+                                    source="test data", reviewed=True, public=True) \
+                .when_get_word_meanings("piece") \
+                .then_should_return(WordMeanings(word="piece",
+                                                 meanings=[Meaning(scientific="lorem", type="noun",
+                                                                   description="A small part",
+                                                                   extra_info="Typical word",
+                                                                   synonym_words=["taste", "specimen"],
+                                                                   related_words=["data", "analysis"])]))
 
-    def test_meaning_is_correctly_parsed(self):
-        GetForWordTestCase.ScenarioMaker() \
-                .given_a_word() \
-                .given_a_meaning_for_that_word() \
-                .when_get_word() \
-                .then_meaning_should_be_correctly_parsed()
+    def test_no_definition_returns_entity_not_found(self):
+        WordRepoTestCase.TestScenario() \
+                .when_get_word_meanings("none") \
+                .then_should_raise(EntityNotFoundException)
 
     def test_private_meaning_should_not_be_returned(self):
-        GetForWordTestCase.ScenarioMaker() \
-                .given_a_word() \
-                .given_a_meaning_for_that_word(public=False) \
-                .when_get_word() \
-                .then_an_empty_list_should_be_returned()
+        WordRepoTestCase.TestScenario() \
+                .given_a_definition(word="piece", phonetic="ph", scientific="lorem", type="noun",
+                                    meaning="A small part", extra_info="Typical word",
+                                    private_notes="secret", synonyms="taste, specimen",
+                                    related="data, analysis", origin="england",
+                                    semantic_field="statistics", semantic_group=1,
+                                    source="test data", reviewed=True, public=True) \
+                .given_a_definition(word="piece", phonetic="ph", scientific="lorem", type="noun",
+                                    meaning="A small part", extra_info="Typical word",
+                                    private_notes="secret", synonyms="taste, specimen",
+                                    related="data, analysis", origin="england",
+                                    semantic_field="statistics", semantic_group=1,
+                                    source="test data", reviewed=True, public=False) \
+                .when_get_word_meanings("piece") \
+                .then_should_return(WordMeanings(word="piece",
+                                                 meanings=[Meaning(scientific="lorem", type="noun",
+                                                                   description="A small part",
+                                                                   extra_info="Typical word",
+                                                                   synonym_words=["taste", "specimen"],
+                                                                   related_words=["data", "analysis"])]))
+
+    def test_no_reviewed_meaning_should_not_be_returned(self):
+        WordRepoTestCase.TestScenario() \
+                .given_a_definition(word="piece", phonetic="ph", scientific="lorem", type="noun",
+                                    meaning="A small part", extra_info="Typical word",
+                                    private_notes="secret", synonyms="taste, specimen",
+                                    related="data, analysis", origin="england",
+                                    semantic_field="statistics", semantic_group=1,
+                                    source="test data", reviewed=True, public=True) \
+                .given_a_definition(word="piece", phonetic="ph", scientific="lorem", type="noun",
+                                    meaning="A small part", extra_info="Typical word",
+                                    private_notes="secret", synonyms="taste, specimen",
+                                    related="data, analysis", origin="england",
+                                    semantic_field="statistics", semantic_group=1,
+                                    source="test data", reviewed=False, public=True) \
+                .when_get_word_meanings("piece") \
+                .then_should_return(WordMeanings(word="piece",
+                                                 meanings=[Meaning(scientific="lorem", type="noun",
+                                                                   description="A small part",
+                                                                   extra_info="Typical word",
+                                                                   synonym_words=["taste", "specimen"],
+                                                                   related_words=["data", "analysis"])]))
 
     def test_two_meanings_should_be_returned_sorted_by_semantic_group(self):
-        GetForWordTestCase.ScenarioMaker() \
-                .given_a_word() \
-                .given_two_meanings_for_that_word() \
-                .when_get_word() \
-                .then_both_should_be_retrieved_in_proper_order()
-
-    class ScenarioMaker(object):
-
-        def __init__(self):
-            self.word = None
-            self.meanings = None
-            self.response = None
-            self.orm_definition = None
-            self.orm_definition_2 = None
-
-        def given_a_word(self):
-            self.word = "sample"
-
-            return self
-
-        def given_no_meanings(self):
-            return self
-
-        def given_a_meaning_for_that_word(self, public=True):
-            self.orm_definition = Definition.objects.create(word=self.word, phonetic="ph", scientific="lorem",
-                                                            type="noun", meaning="A small part",
-                                                            extra_info="Typical word",
-                                                            private_notes="secret", synonyms="taste, specimen",
-                                                            related="data, analysis", origin="england",
-                                                            semantic_field="statistics", semantic_group=1,
-                                                            source="test data", reviewed=True, public=public)
-
-            return self
-
-        def given_two_meanings_for_that_word(self):
-            self.orm_definition = Definition.objects.create(word=self.word, phonetic="ph", scientific="lorem",
-                                                            type="noun", meaning="A small part",
-                                                            extra_info="Typical word",
-                                                            private_notes="secret", synonyms="taste, specimen",
-                                                            related="data, analysis", origin="england",
-                                                            semantic_field="statistics", semantic_group=1,
-                                                            source="test data", reviewed=True, public=True)
-
-            self.orm_definition_2 = Definition.objects.create(word=self.word, phonetic="zh", scientific="ipsum",
-                                                              type="verb", meaning="Take a sample",
-                                                              extra_info="Non typical word",
-                                                              private_notes="secret", synonyms="try, test",
-                                                              related="data, analysis", origin="england",
-                                                              semantic_field="statistics", semantic_group=2,
-                                                              source="test data", reviewed=True, public=True)
-
-            return self
-
-        def when_get_word(self):
-            self.response = WordRepo().get_word_meanings(self.word)
-
-            return self
-
-        def then_an_empty_list_should_be_returned(self):
-            assert self.response == WordMeanings(self.word, [])
-
-            return self
-
-        def then_meaning_should_be_correctly_parsed(self):
-            assert self.response.word == self.word
-            self._assert_orm_definition_and_meaning_are_equal(orm_definition=self.orm_definition,
-                                                              meaning=self.response.meanings[0])
-
-            return self
-
-        def then_both_should_be_retrieved_in_proper_order(self):
-            assert self.response.word == self.word
-            self._assert_orm_definition_and_meaning_are_equal(orm_definition=self.orm_definition,
-                                                              meaning=self.response.meanings[0])
-            self._assert_orm_definition_and_meaning_are_equal(orm_definition=self.orm_definition_2,
-                                                              meaning=self.response.meanings[1])
-
-            return self
-
-        def _assert_orm_definition_and_meaning_are_equal(self, orm_definition, meaning):
-            assert orm_definition.scientific == meaning.scientific
-            assert orm_definition.type == meaning.type
-            assert orm_definition.meaning == meaning.description
-            assert orm_definition.extra_info == meaning.extra_info
-            assert orm_definition.synonyms.split(', ') == meaning.synonym_words
-            assert orm_definition.related.split(', ') == meaning.related_words
-
-
-class GetAllWordsTestCase(TestCase):
+        WordRepoTestCase.TestScenario() \
+                .given_a_definition(word="piece", phonetic="ph2", scientific="lorem2", type="noun2",
+                                    meaning="A small part2", extra_info="Typical word2",
+                                    private_notes="secret2", synonyms="taste2, specimen2",
+                                    related="data2, analysis2", origin="england2",
+                                    semantic_field="statistics2", semantic_group=2,
+                                    source="test data", reviewed=True, public=True) \
+                .given_a_definition(word="piece", phonetic="ph", scientific="lorem", type="noun",
+                                    meaning="A small part", extra_info="Typical word",
+                                    private_notes="secret", synonyms="taste, specimen",
+                                    related="data, analysis", origin="england",
+                                    semantic_field="statistics", semantic_group=1,
+                                    source="test data", reviewed=True, public=True) \
+                .when_get_word_meanings("piece") \
+                .then_should_return(WordMeanings(word="piece",
+                                                 meanings=[Meaning(scientific="lorem", type="noun",
+                                                                   description="A small part",
+                                                                   extra_info="Typical word",
+                                                                   synonym_words=["taste", "specimen"],
+                                                                   related_words=["data", "analysis"]),
+                                                           Meaning(scientific="lorem2", type="noun2",
+                                                                   description="A small part2",
+                                                                   extra_info="Typical word2",
+                                                                   synonym_words=["taste2", "specimen2"],
+                                                                   related_words=["data2", "analysis2"])]))
 
     def test_returns_words_with_their_meanings(self):
-        GetAllWordsTestCase.ScenarioMaker() \
+        WordRepoTestCase.TestScenario() \
                 .given_a_definition(word='word_a', scientific='s', type='t', meaning='one',
-                                 extra_info='x', synonyms="a, b 2", related="c 1, b 2", public=True) \
+                                    extra_info='x', synonyms="a, b 2", related="c 1, b 2", public=True) \
                 .given_a_definition(word='word_a', scientific='r', type='u', meaning='two',
-                                 extra_info='y', synonyms="x, b2", related="c1, w2", public=True) \
+                                    extra_info='y', synonyms="x, b2", related="c1, w2", public=True) \
                 .given_a_definition(word='word_b', scientific='s', type='q', meaning='new',
-                                 extra_info='o', synonyms="x, b2", related="c1, w2", public=True) \
+                                    extra_info='o', synonyms="x, b2", related="c1, w2", public=True) \
                 .when_get_all_words() \
                 .then_should_return([
                     WordMeanings(word='word_a', meanings=[
@@ -142,12 +123,25 @@ class GetAllWordsTestCase(TestCase):
                     ]),
                 ])
 
-    class ScenarioMaker(object):
+    class TestScenario(object):
 
-        def given_a_definition(self, word, scientific, type, meaning,
-                               extra_info, synonyms, related, public):
-            Definition.objects.create(word=word, scientific=scientific, type=type, meaning=meaning,
-                                      extra_info=extra_info, synonyms=synonyms, related=related, public=public)
+        def given_a_definition(self, word, phonetic="", scientific="", type="", meaning="", extra_info="",
+                               private_notes="", synonyms=[], related=[], origin="", semantic_field="",
+                               semantic_group=0, source="", reviewed=True, public=True):
+            Definition.objects.create(word=word, phonetic=phonetic, scientific=scientific,
+                                      type=type, meaning=meaning, extra_info=extra_info,
+                                      private_notes=private_notes, synonyms=synonyms, related=related,
+                                      origin=origin, semantic_field=semantic_field,
+                                      semantic_group=semantic_group, source=source,
+                                      reviewed=reviewed, public=public)
+            return self
+
+        def when_get_word_meanings(self, word):
+            try:
+                self.response = WordRepo().get_word_meanings(word)
+            except Exception as e:
+                self.error = e
+
             return self
 
         def when_get_all_words(self):
@@ -156,6 +150,10 @@ class GetAllWordsTestCase(TestCase):
 
         def then_should_return(self, response):
             assert self.response == response
+            return self
+
+        def then_should_raise(self, error):
+            assert type(self.error) is error
             return self
 
 
