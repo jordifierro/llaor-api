@@ -1,5 +1,6 @@
 import itertools
 from elasticsearch import NotFoundError as ElasticSearchNotFoundError
+from django.db.models import Case, When
 
 from llaor.exceptions import EntityNotFoundException
 from dictionary.entities import Meaning, WordMeanings
@@ -31,9 +32,11 @@ class WordRepo(object):
         return WordMeanings(word, meanings)
 
     def get_words_meanings(self, words):
+        preserved = Case(*[When(word=pk, then=pos) for pos, pk in enumerate(words)])
         orm_definitions = Definition.objects.filter(word__in=words) \
                                             .filter(public=True) \
-                                            .filter(reviewed=True)
+                                            .filter(reviewed=True) \
+                                            .order_by(preserved)
 
         words_meanings = []
         for key, group in itertools.groupby(orm_definitions, key=lambda x:x.word):
