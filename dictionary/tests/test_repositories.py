@@ -4,8 +4,7 @@ import logging
 from django.test import TestCase
 
 from llaor.exceptions import EntityNotFoundException
-from dictionary.factories import create_word_search_repo
-from dictionary.repositories import WordRepo
+from dictionary.factories import create_word_search_repo, create_word_repo
 from dictionary.models import Definition
 from dictionary.entities import WordMeanings, Meaning
 
@@ -175,6 +174,30 @@ class WordRepoTestCase(TestCase):
                     ]),
                 ])
 
+    def test_search_by_first_letter(self):
+        WordRepoTestCase.TestScenario() \
+                .given_a_definition(word='a_word', scientific='s', type='t', meaning='one',
+                                    extra_info='x', synonyms="a, b 2", related="c 1, b 2", public=True) \
+                .given_a_definition(word='a_word', scientific='r', type='u', meaning='two',
+                                    extra_info='y', synonyms="x, b2", related="c1, w2", public=True) \
+                .given_a_definition(word='a', scientific='r', type='w', meaning='first',
+                                    extra_info='q', synonyms="o, b9", related="c4, t2", public=True) \
+                .given_a_definition(word='word_b', scientific='s', type='q', meaning='new',
+                                    extra_info='o', synonyms="x, b2", related="c1, w2", public=True) \
+                .given_a_definition(word='b_word', scientific='s', type='q', meaning='new',
+                                    extra_info='o', synonyms="x, b2", related="c1, w2", public=True) \
+                .given_everything_is_indexed() \
+                .when_get_words_meanings_by_fisrt_letter('a') \
+                .then_should_return([
+                    WordMeanings(word='a', meanings=[
+                        Meaning('r', 'w', 'first', 'q', ['o', 'b9'], ['c4', 't2'])
+                    ]),
+                    WordMeanings(word='a_word', meanings=[
+                        Meaning('s', 't', 'one', 'x', ['a', 'b 2'], ['c 1', 'b 2']),
+                        Meaning('r', 'u', 'two', 'y', ['x', 'b2'], ['c1', 'w2'])
+                    ]),
+                ])
+
     class TestScenario(object):
 
         def given_a_definition(self, word, phonetic="", scientific="", type="", meaning="", extra_info="",
@@ -188,20 +211,38 @@ class WordRepoTestCase(TestCase):
                                       reviewed=reviewed, public=public)
             return self
 
+        def given_everything_is_indexed(self):
+            search_repo = create_word_search_repo()
+            try:
+                search_repo._delete_word_index()
+            except NotFoundError:
+                pass
+            search_repo._create_word_index()
+            all_words_meanings = create_word_repo().get_all_words_meanings()
+            for word_meanings in all_words_meanings:
+                search_repo.index_word(word_meanings)
+            logging.getLogger('elasticsearch').setLevel(logging.ERROR)
+            search_repo._refresh_word_index()
+            return self
+
         def when_get_word_meanings(self, word):
             try:
-                self.response = WordRepo().get_word_meanings(word)
+                self.response = create_word_repo().get_word_meanings(word)
             except Exception as e:
                 self.error = e
 
             return self
 
         def when_get_words_meanings(self, words):
-            self.response = WordRepo().get_words_meanings(words)
+            self.response = create_word_repo().get_words_meanings(words)
             return self
 
         def when_get_all_words(self):
-            self.response = WordRepo().get_all_words_meanings()
+            self.response = create_word_repo().get_all_words_meanings()
+            return self
+
+        def when_get_words_meanings_by_fisrt_letter(self, letter):
+            self.response = create_word_repo().get_words_meanings_by_first_letter(letter)
             return self
 
         def then_should_return(self, response):

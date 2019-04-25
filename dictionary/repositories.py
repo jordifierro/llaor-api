@@ -9,6 +9,9 @@ from dictionary.models import Definition
 
 class WordRepo(object):
 
+    def __init__(self, word_search_repo):
+        self.word_search_repo = word_search_repo
+
     def get_all_words_meanings(self):
         definitions = Definition.objects.filter(public=True).order_by('word')
 
@@ -44,6 +47,10 @@ class WordRepo(object):
             words_meanings.append(WordMeanings(key, meanings))
 
         return words_meanings
+
+    def get_words_meanings_by_first_letter(self, letter):
+        words = self.word_search_repo.search_words_by_first_letter(letter)
+        return self.get_words_meanings(words)
 
     def parse_meaning(self, orm_definition):
         return Meaning(scientific=orm_definition.scientific,
