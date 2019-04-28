@@ -27,6 +27,10 @@ docker-compose run api python manage.py test
 ### Words
 
 #### `GET /words`
+#### `GET /words?first_letter=a`
+
+Retrieves all words with their meanings.
+Can be filtered by word's first letter.
 
 _Response:_
 ```json
