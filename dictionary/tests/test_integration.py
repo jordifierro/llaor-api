@@ -1,6 +1,7 @@
 import json
 import logging
 from mock import patch
+from elasticsearch.exceptions import NotFoundError
 
 from django.test import TestCase
 from django.test import Client

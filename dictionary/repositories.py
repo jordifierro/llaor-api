@@ -85,9 +85,21 @@ class WordSearchRepo(object):
             },
             "mappings": {
                 WordSearchRepo.WORD_DOC_TYPE: {
-                    "_source": {"enabled": False},
+                    "_source": {
+                        "enabled": False
+                    },
                     "properties": {
-                        "word": {"type": "keyword"},
+                        "word": {
+                            "type": "keyword"
+                        },
+                        "analyzed_word": {
+                            "type": "text",
+                            "analyzer": "catalan"
+                        },
+                        "other_text": {
+                            "type": "text",
+                            "analyzer": "catalan"
+                        },
                     }
                 }
             }
@@ -101,8 +113,17 @@ class WordSearchRepo(object):
         self.elastic_client.indices.delete(index=WordSearchRepo.WORD_INDEX)
 
     def index_word(self, word_meanings):
+        joined_text = ''
+        for meaning in word_meanings.meanings:
+            joined_meaning = '{} {} {} {}'.format(meaning.scientific,
+                                                  meaning.description,
+                                                  ' '.join(meaning.synonym_words),
+                                                  ' '.join(meaning.related_words))
+            joined_text = '{} {}'.format(joined_text, joined_meaning)
         doc = {
                 'word': word_meanings.word,
+                'analyzed_word': word_meanings.word,
+                'other_text': joined_text
               }
         self.elastic_client.index(index=WordSearchRepo.WORD_INDEX,
                                   doc_type=WordSearchRepo.WORD_DOC_TYPE,
@@ -155,3 +176,19 @@ class WordSearchRepo(object):
         res = self.elastic_client.search(index=WordSearchRepo.WORD_INDEX, body=search_query)
 
         return [x['_id'] for x in res['hits']['hits']][0]
+
+    def search_words(self, text):
+        search_query = {
+            "size": 50,
+            "query": {
+                "multi_match": {
+                  "query": text,
+                  "fields": ["word^5", "analyzed_word^5", "other_text"],
+                  "fuzziness": "AUTO"
+                }
+            }
+        }
+
+        res = self.elastic_client.search(index=WordSearchRepo.WORD_INDEX, body=search_query)
+
+        return [x['_id'] for x in res['hits']['hits']]

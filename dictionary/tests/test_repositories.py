@@ -312,7 +312,91 @@ class WordSearchRepoTestCase(TestCase):
                 .given_a_word(WordMeanings('xyz', [])) \
                 .given_everythin_is_indexed() \
                 .when_get_random_word() \
-                .then_should_return_one_of(['baaa', 'xyz']) \
+                .then_should_return_one_of(['baaa', 'xyz'])
+
+    def test_search_words_when_no_match(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .when_search_word('any') \
+                .then_should_return([])
+
+    def test_search_words_matches_by_word(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(WordMeanings('sabuda', [])) \
+                .given_a_word(WordMeanings('assaumanyat', [])) \
+                .given_everythin_is_indexed() \
+                .when_search_word('sabuda') \
+                .then_should_return(['sabuda'])
+
+    def test_search_words_matches_with_hyphen(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(WordMeanings('avenar-se', [])) \
+                .given_everythin_is_indexed() \
+                .when_search_word('avenar-se') \
+                .then_should_return(['avenar-se'])
+
+    def test_search_words_matches_with_accent(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(WordMeanings('després', [])) \
+                .given_everythin_is_indexed() \
+                .when_search_word('després') \
+                .then_should_return(['després'])
+
+    def test_search_words_matches_by_root_word(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(WordMeanings('mallar', [])) \
+                .given_everythin_is_indexed() \
+                .when_search_word('mallem') \
+                .then_should_return(['mallar'])
+
+    def test_search_words_matches_femenine_gender(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(WordMeanings('encalamunat -da', [])) \
+                .given_everythin_is_indexed() \
+                .when_search_word('encalamunada') \
+                .then_should_return(['encalamunat -da'])
+
+    def test_search_words_matches_with_typo(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(WordMeanings('panasca', [])) \
+                .given_everythin_is_indexed() \
+                .when_search_word('panaso') \
+                .then_should_return(['panasca'])
+
+    def test_search_words_matches_by_description(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(WordMeanings('mallorquer', [Meaning('', '', 'la planta del blat de moro', '', [], [])])) \
+                .given_everythin_is_indexed() \
+                .when_search_word('blat') \
+                .then_should_return(['mallorquer'])
+
+    def test_search_words_matches_by_scientific(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(WordMeanings('sègol', [Meaning('secale cereale', '', '', '', [], [])])) \
+                .given_everythin_is_indexed() \
+                .when_search_word('secale') \
+                .then_should_return(['sègol'])
+
+    def test_search_words_matches_by_synonyms(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(WordMeanings('corna', [Meaning('', '', '', '', ['bana'], [])])) \
+                .given_everythin_is_indexed() \
+                .when_search_word('bana') \
+                .then_should_return(['corna'])
+
+    def test_search_words_matches_by_related(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(WordMeanings('lliri blanc', [Meaning('', '', '', '', [], ['assutzena'])])) \
+                .given_everythin_is_indexed() \
+                .when_search_word('assutzena') \
+                .then_should_return(['lliri blanc'])
+
+    def test_search_words_boosts_word_over_meaning(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(WordMeanings('cadell', [Meaning('', '', '', '', ['gosset'], [])])) \
+                .given_a_word(WordMeanings('gosset', [Meaning('', '', '', '', ['cadell'], [])])) \
+                .given_everythin_is_indexed() \
+                .when_search_word('gosset') \
+                .then_should_return(['gosset', 'cadell'])
 
     class TestScenario:
 
@@ -342,6 +426,10 @@ class WordSearchRepoTestCase(TestCase):
 
         def when_get_random_word(self):
             self.result = self.repo.get_random_word()
+            return self
+
+        def when_search_word(self, text):
+            self.result = self.repo.search_words(text)
             return self
 
         def then_should_return(self, result):
