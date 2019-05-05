@@ -164,6 +164,36 @@ class TestWordView(object):
                            },
                        ]})
 
+    def test_if_word_is_random_retrieves_and_returns_random_word_meanings(self):
+        meaning_a = Meaning(scientific='sc', type='ty', description='desc', extra_info='e_i',
+                            synonym_words=['a', 'b'], related_words=['c', 'd'])
+        meaning_b = Meaning(scientific='lorem', type='noun', description='word meaning', extra_info='none',
+                            synonym_words=[], related_words=[])
+
+        TestWordView.TestScenario() \
+                .given_a_word_repo_that_returns_on_random(WordMeanings("Test", [meaning_a, meaning_b])) \
+                .when_get_word_view("random") \
+                .then_should_call_repo_get_random_word_meanings() \
+                .then_should_response(200, {'word': 'Test', 
+                    'meanings': [
+                           {
+                               'scientific': 'sc',
+                               'type': 'ty',
+                               'description': 'desc',
+                               'extra_info': 'e_i',
+                               'synonym_words': ['a', 'b'],
+                               'related_words': ['c', 'd']
+                           },
+                           {
+                               'scientific': 'lorem',
+                               'type': 'noun',
+                               'description': 'word meaning',
+                               'extra_info': 'none',
+                               'synonym_words': [],
+                               'related_words': [],
+                           },
+                       ]})
+
 
     class TestScenario:
 
@@ -172,12 +202,21 @@ class TestWordView(object):
             self.word_repo_mock.get_word_meanings.return_value = word_meanings
             return self
 
+        def given_a_word_repo_that_returns_on_random(self, word_meanings):
+            self.word_repo_mock = Mock()
+            self.word_repo_mock.get_random_word_meanings.return_value = word_meanings
+            return self
+
         def when_get_word_view(self, word):
             self.body, self.status = WordView(word_repo=self.word_repo_mock).get(word=word)
             return self
 
         def then_should_call_repo_get_meanings_for_word(self, word):
             self.word_repo_mock.get_word_meanings.assert_called_once_with(word)
+            return self
+
+        def then_should_call_repo_get_random_word_meanings(self):
+            self.word_repo_mock.get_random_word_meanings.assert_called_once()
             return self
 
         def then_should_response(self, status, body):

@@ -198,6 +198,29 @@ class WordRepoTestCase(TestCase):
                     ]),
                 ])
 
+    def test_get_word_meanings_random(self):
+        WordRepoTestCase.TestScenario() \
+                .given_a_definition(word='a_word', scientific='s', type='t', meaning='one',
+                                    extra_info='x', synonyms="a, b 2", related="c 1, b 2", public=True) \
+                .given_a_definition(word='a_word', scientific='r', type='u', meaning='two',
+                                    extra_info='y', synonyms="x, b2", related="c1, w2", public=True) \
+                .given_a_definition(word='word_b', scientific='s', type='q', meaning='new',
+                                    extra_info='o', synonyms="x, b2", related="c1, w2", public=True) \
+                .given_a_definition(word='word_b', scientific='p', type='m', meaning='old',
+                                    extra_info='u', synonyms="w, b3", related="c8, w9", public=True) \
+                .given_everything_is_indexed() \
+                .when_get_random_word_meanings() \
+                .then_should_return_one_of([
+                    WordMeanings(word='a_word', meanings=[
+                        Meaning('s', 't', 'one', 'x', ['a', 'b 2'], ['c 1', 'b 2']),
+                        Meaning('r', 'u', 'two', 'y', ['x', 'b2'], ['c1', 'w2'])
+                    ]),
+                    WordMeanings(word='word_b', meanings=[
+                        Meaning('s', 'q', 'new', 'o', ['x', 'b2'], ['c1', 'w2']),
+                        Meaning('p', 'm', 'old', 'u', ['w', 'b3'], ['c8', 'w9'])
+                    ]),
+                ])
+
     class TestScenario(object):
 
         def given_a_definition(self, word, phonetic="", scientific="", type="", meaning="", extra_info="",
@@ -245,8 +268,16 @@ class WordRepoTestCase(TestCase):
             self.response = create_word_repo().get_words_meanings_by_first_letter(letter)
             return self
 
+        def when_get_random_word_meanings(self):
+            self.response = create_word_repo().get_random_word_meanings()
+            return self
+
         def then_should_return(self, response):
             assert self.response == response
+            return self
+
+        def then_should_return_one_of(self, possible_responses):
+            assert self.response in possible_responses
             return self
 
         def then_should_raise(self, error):
@@ -263,15 +294,25 @@ class WordSearchRepoTestCase(TestCase):
                 .given_a_word(WordMeanings('adeu', [])) \
                 .given_a_word(WordMeanings('baaa', [])) \
                 .given_a_word(WordMeanings('xyz', [])) \
-                .when_index_everything_and_search_by_first_letter('a') \
+                .given_everythin_is_indexed() \
+                .when_search_by_first_letter('a') \
                 .then_should_return(['a', 'adeu', 'ahola'])
 
     def test_search_by_first_letter_with_no_matches(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('baaa', [])) \
                 .given_a_word(WordMeanings('xyz', [])) \
-                .when_index_everything_and_search_by_first_letter('a') \
+                .given_everythin_is_indexed() \
+                .when_search_by_first_letter('a') \
                 .then_should_return([])
+
+    def test_get_random_word_returns_a_word(self):
+        WordSearchRepoTestCase.TestScenario() \
+                .given_a_word(WordMeanings('baaa', [])) \
+                .given_a_word(WordMeanings('xyz', [])) \
+                .given_everythin_is_indexed() \
+                .when_get_random_word() \
+                .then_should_return_one_of(['baaa', 'xyz']) \
 
     class TestScenario:
 
@@ -289,13 +330,24 @@ class WordSearchRepoTestCase(TestCase):
             self.words.append(word)
             return self
 
-        def when_index_everything_and_search_by_first_letter(self, first_letter):
+        def given_everythin_is_indexed(self):
             for word in self.words:
                 self.repo.index_word(word)
             self.repo._refresh_word_index()
+            return self
+
+        def when_search_by_first_letter(self, first_letter):
             self.result = self.repo.search_words_by_first_letter(first_letter)
+            return self
+
+        def when_get_random_word(self):
+            self.result = self.repo.get_random_word()
             return self
 
         def then_should_return(self, result):
             assert self.result == result
+            return self
+
+        def then_should_return_one_of(self, word_options):
+            assert self.result in word_options
             return self

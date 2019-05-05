@@ -82,6 +82,9 @@ _Response:_
 ```
 
 #### `GET /words/<word>`
+#### `GET /words/random`
+
+If random word, instead of fetch word called 'random', returns a random word.
 
 _Response:_
 ```json

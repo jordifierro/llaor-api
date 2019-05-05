@@ -161,6 +161,33 @@ class WordViewTestCase(TestCase):
                            },
                        ]})
     
+    def test_random_word_returns_word_meaning(self):
+        WordViewTestCase.TestScenario() \
+                .given_a_definition(word="target", scientific="sc", type="ty", meaning="desc",
+                                    extra_info="e_i", synonyms="a, b", related="c, d") \
+                .given_a_definition(word="target", scientific="lorem", type="noun",
+                                    meaning="word meaning", extra_info="none") \
+                .given_everything_is_indexed() \
+                .when_get_word('random') \
+                .then_should_response(200, {'word': 'target',
+                    'meanings': [
+                           {
+                               'scientific': 'sc',
+                               'type': 'ty',
+                               'description': 'desc',
+                               'extra_info': 'e_i',
+                               'synonym_words': ['a', 'b'],
+                               'related_words': ['c', 'd']
+                           },
+                           {
+                               'scientific': 'lorem',
+                               'type': 'noun',
+                               'description': 'word meaning',
+                               'extra_info': 'none',
+                               'synonym_words': [],
+                               'related_words': [],
+                           },
+                       ]})
 
     class TestScenario:
 
@@ -168,6 +195,20 @@ class WordViewTestCase(TestCase):
             Definition.objects.create(word=word, scientific=scientific, type=type,
                                       meaning=meaning, extra_info=extra_info,
                                       synonyms=synonyms, related=related)
+            return self
+            
+        def given_everything_is_indexed(self):
+            search_repo = create_word_search_repo()
+            try:
+                search_repo._delete_word_index()
+            except NotFoundError:
+                pass
+            search_repo._create_word_index()
+            all_words_meanings = create_word_repo().get_all_words_meanings()
+            for word_meanings in all_words_meanings:
+                search_repo.index_word(word_meanings)
+            logging.getLogger('elasticsearch').setLevel(logging.ERROR)
+            search_repo._refresh_word_index()
             return self
             
         def when_get_word(self, word):

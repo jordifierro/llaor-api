@@ -23,7 +23,10 @@ class WordView(object):
         self.word_repo = word_repo
 
     def get(self, word):
-        word_meanings = self.word_repo.get_word_meanings(word)
+        if word == 'random':
+            word_meanings = self.word_repo.get_random_word_meanings()
+        else:
+            word_meanings = self.word_repo.get_word_meanings(word)
 
         body = serialize_word_meanings(word_meanings)
         status = 200

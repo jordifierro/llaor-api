@@ -1,4 +1,5 @@
 import itertools
+import random
 from elasticsearch import NotFoundError as ElasticSearchNotFoundError
 from django.db.models import Case, When
 
@@ -51,6 +52,10 @@ class WordRepo(object):
     def get_words_meanings_by_first_letter(self, letter):
         words = self.word_search_repo.search_words_by_first_letter(letter)
         return self.get_words_meanings(words)
+
+    def get_random_word_meanings(self):
+        word = self.word_search_repo.get_random_word()
+        return self.get_word_meanings(word)
 
     def parse_meaning(self, orm_definition):
         return Meaning(scientific=orm_definition.scientific,
@@ -130,3 +135,23 @@ class WordSearchRepo(object):
         res = self.elastic_client.search(index=WordSearchRepo.WORD_INDEX, body=search_query)
 
         return [x['_id'] for x in res['hits']['hits']]
+
+    def get_random_word(self):
+        search_query = {
+            "size": 1,
+            "query": {
+                "function_score": {
+                    "functions": [
+                        {
+                            "random_score": {
+                                "seed": str(random.randint(1, 1000000))
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+
+        res = self.elastic_client.search(index=WordSearchRepo.WORD_INDEX, body=search_query)
+
+        return [x['_id'] for x in res['hits']['hits']][0]
