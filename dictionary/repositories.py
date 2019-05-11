@@ -143,6 +143,7 @@ class WordSearchRepo(object):
 
     def search_words_by_first_letter(self, first_letter):
         search_query = {
+            "size": 200,
             "sort": [
                 {
                     "word": {
