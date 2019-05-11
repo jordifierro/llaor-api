@@ -6,11 +6,13 @@ class AllWordsView(object):
     def __init__(self, word_repo):
         self.word_repo = word_repo
 
-    def get(self, first_letter=None):
-        if first_letter is None:
-            words_meanings = self.word_repo.get_all_words_meanings()
-        else:
+    def get(self, first_letter=None, search=None):
+        if first_letter is not None:
             words_meanings = self.word_repo.get_words_meanings_by_first_letter(first_letter)
+        elif search is not None:
+            words_meanings = self.word_repo.search_words_meanings(search)
+        else:
+            words_meanings = self.word_repo.get_all_words_meanings()
 
         body = serialize_words_meanings(words_meanings)
         status = 200

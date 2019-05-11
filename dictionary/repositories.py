@@ -53,6 +53,10 @@ class WordRepo(object):
         words = self.word_search_repo.search_words_by_first_letter(letter)
         return self.get_words_meanings(words)
 
+    def search_words_meanings(self, text):
+        words = self.word_search_repo.search_words(text)
+        return self.get_words_meanings(words)
+
     def get_random_word_meanings(self):
         word = self.word_search_repo.get_random_word()
         return self.get_word_meanings(word)

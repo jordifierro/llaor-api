@@ -28,9 +28,11 @@ docker-compose run api python manage.py test
 
 #### `GET /words`
 #### `GET /words?first_letter=a`
+#### `GET /words?search=muntanya`
 
 Retrieves all words with their meanings.
 Can be filtered by word's first letter.
+Can be use to search words by text.
 
 _Response:_
 ```json

@@ -96,6 +96,51 @@ class AllWordsViewTestCase(TestCase):
                 }
             ])
 
+    def test_get_all_words_with_search_query_param(self):
+        AllWordsViewTestCase.TestScenario() \
+            .given_a_definition(word="other", scientific="s", type="t", meaning="other",
+                                extra_info="x", semantic_group=1, source="test data",
+                                synonyms="a, b", related="x, z", public=True) \
+            .given_a_definition(word="word_a", scientific="s", type="t", meaning="any target",
+                                extra_info="x", semantic_group=1, source="test data",
+                                synonyms="a, b", related="x, z", public=True) \
+            .given_a_definition(word="word_b", scientific="s", type="t", meaning="other target",
+                                extra_info="x", semantic_group=1, source="test data",
+                                synonyms="a, b", related="x, z", public=True) \
+            .given_a_definition(word="a", scientific="s", type="t", meaning="other",
+                                extra_info="x", semantic_group=1, source="test data",
+                                synonyms="a, b", related="x, z", public=True) \
+            .given_everything_is_indexed() \
+            .when_get_words(search='target') \
+            .then_should_response(200, [
+                {
+                    'word': 'word_a',
+                    'meanings': [
+                        {
+                            'scientific': 's',
+                            'type': 't',
+                            'description': 'any target',
+                            'extra_info': 'x',
+                            'synonym_words': ['a', 'b'],
+                            'related_words': ['x', 'z']
+                        }
+                    ]
+                },
+                {
+                    'word': 'word_b',
+                    'meanings': [
+                        {
+                            'scientific': 's',
+                            'type': 't',
+                            'description': 'other target',
+                            'extra_info': 'x',
+                            'synonym_words': ['a', 'b'],
+                            'related_words': ['x', 'z']
+                        }
+                    ]
+                }
+            ])
+
     class TestScenario:
 
         def given_a_definition(self, word, scientific, type, meaning, extra_info,
@@ -120,11 +165,13 @@ class AllWordsViewTestCase(TestCase):
             search_repo._refresh_word_index()
             return self
             
-        def when_get_words(self, first_letter=None):
-            if first_letter is None:
-                self.response = Client().get(reverse('words'))
-            else:
+        def when_get_words(self, first_letter=None, search=None):
+            if first_letter is not None:
                 self.response = Client().get('{}?first_letter={}'.format(reverse('words'), first_letter))
+            elif search is not None:
+                self.response = Client().get('{}?search={}'.format(reverse('words'), search))
+            else:
+                self.response = Client().get(reverse('words'))
             return self
 
         def then_should_response(self, status, body):

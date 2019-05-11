@@ -198,6 +198,30 @@ class WordRepoTestCase(TestCase):
                     ]),
                 ])
 
+    def test_search_words_meanings(self):
+        WordRepoTestCase.TestScenario() \
+                .given_a_definition(word='a_word', scientific='s', type='t', meaning='one target',
+                                    extra_info='x', synonyms="a, b 2", related="c 1, b 2", public=True) \
+                .given_a_definition(word='a_word', scientific='r', type='u', meaning='two',
+                                    extra_info='y', synonyms="x, b2", related="c1, w2", public=True) \
+                .given_a_definition(word='target', scientific='r', type='w', meaning='first',
+                                    extra_info='q', synonyms="o, b9", related="c4, t2", public=True) \
+                .given_a_definition(word='word_b', scientific='s', type='q', meaning='new',
+                                    extra_info='o', synonyms="x, b2", related="c1, w2", public=True) \
+                .given_a_definition(word='b_word', scientific='s', type='q', meaning='new',
+                                    extra_info='o', synonyms="x, b2", related="c1, w2", public=True) \
+                .given_everything_is_indexed() \
+                .when_search_words_meanings('target') \
+                .then_should_return([
+                    WordMeanings(word='target', meanings=[
+                        Meaning('r', 'w', 'first', 'q', ['o', 'b9'], ['c4', 't2'])
+                    ]),
+                    WordMeanings(word='a_word', meanings=[
+                        Meaning('s', 't', 'one target', 'x', ['a', 'b 2'], ['c 1', 'b 2']),
+                        Meaning('r', 'u', 'two', 'y', ['x', 'b2'], ['c1', 'w2'])
+                    ]),
+                ])
+
     def test_get_word_meanings_random(self):
         WordRepoTestCase.TestScenario() \
                 .given_a_definition(word='a_word', scientific='s', type='t', meaning='one',
@@ -266,6 +290,10 @@ class WordRepoTestCase(TestCase):
 
         def when_get_words_meanings_by_fisrt_letter(self, letter):
             self.response = create_word_repo().get_words_meanings_by_first_letter(letter)
+            return self
+
+        def when_search_words_meanings(self, text):
+            self.response = create_word_repo().search_words_meanings(text)
             return self
 
         def when_get_random_word_meanings(self):
