@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: gunicorn llaor.wsgi --log-file -
+  web: python manage.py collectstatic --noinput && gunicorn llaor.wsgi --log-file -
