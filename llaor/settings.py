@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import json
 import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -29,6 +30,7 @@ DEBUG = bool(int(os.environ['DEBUG']))
 
 if not LOCAL_DEPLOY:
     ALLOWED_HOSTS = [os.environ['ALLOWED_HOSTS'], ]
+    CORS_ORIGIN_WHITELIST = json.loads(os.environ['CORS_ORIGIN_WHITELIST'])
 
 
 # Application definition
@@ -40,10 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'dictionary',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
