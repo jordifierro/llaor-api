@@ -22,6 +22,21 @@ docker-compose run api pytest
 docker-compose run api python manage.py test
 ```
 
+### DB setup
+
+Run this the first time:
+
+```bash
+docker-compose run api bash
+python manage.py migrate
+python manage.py createsuperuser
+```
+
+Then you can access admin on `localhost:8000/admin` and insert your first definitions
+
+After that on `locahost:8000/words/<inserted_word>` you will find them.
+
+
 ## Documentation
 
 ### Words
