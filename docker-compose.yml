@@ -10,6 +10,7 @@ services:
       - DATABASE_PASS=password
       - DATABASE_HOST=db
       - DATABASE_PORT=5432
+      - ELASTICSEARCH_URL=elasticsearch:9200
       - PORT=8000
     env_file:
       - .env

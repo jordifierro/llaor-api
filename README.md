@@ -32,7 +32,12 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-Then you can access admin on `localhost:8000/admin` and insert your first definitions
+Then you can access admin on `localhost:8000/admin` and insert your first definitions.
+To create search index and index all words:
+```bash
+python manage.py create_word_index
+python manage.py reindex_all_words
+```
 
 After that on `locahost:8000/words/<inserted_word>` you will find them.
 
