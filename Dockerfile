@@ -10,4 +10,4 @@ RUN pip install -r requirements.txt
 
 COPY . /code/
 
-CMD gunicorn --bind 0.0.0.0:$PORT wsgi
+CMD python manage.py collectstatic && gunicorn --bind 0.0.0.0:$PORT llaor.wsgi
