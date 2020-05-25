@@ -10,4 +10,4 @@ RUN pip install -r requirements.txt
 
 COPY . /code/
 
-CMD rm -rf /code/llaor/staticfiles/* && python manage.py collectstatic && gunicorn --bind 0.0.0.0:$PORT llaor.wsgi
+CMD rm -rf /code/llaor/staticfiles/* && python manage.py collectstatic --no-input && gunicorn --bind 0.0.0.0:$PORT llaor.wsgi
