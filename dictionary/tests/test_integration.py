@@ -3,8 +3,7 @@ import logging
 from mock import patch
 from elasticsearch.exceptions import NotFoundError
 
-from django.test import TestCase
-from django.test import Client
+from django.test import TestCase, tag, Client
 from django.core.urlresolvers import reverse
 
 from dictionary.models import Definition
@@ -51,6 +50,7 @@ class AllWordsViewTestCase(TestCase):
                 }
             ])
     
+    @tag('elasticsearch')
     def test_get_all_words_with_first_letter_query_param(self):
         AllWordsViewTestCase.TestScenario() \
             .given_a_definition(word="other", scientific="s", type="t", meaning="other",
@@ -96,6 +96,7 @@ class AllWordsViewTestCase(TestCase):
                 }
             ])
 
+    @tag('elasticsearch')
     def test_get_all_words_with_search_query_param(self):
         AllWordsViewTestCase.TestScenario() \
             .given_a_definition(word="other", scientific="s", type="t", meaning="other",
@@ -209,6 +210,7 @@ class WordViewTestCase(TestCase):
                            },
                        ]})
     
+    @tag('elasticsearch')
     def test_random_word_returns_word_meaning(self):
         WordViewTestCase.TestScenario() \
                 .given_a_definition(word="target", scientific="sc", type="ty", meaning="desc",

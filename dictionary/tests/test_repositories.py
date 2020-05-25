@@ -1,7 +1,7 @@
 from elasticsearch.exceptions import NotFoundError
 import logging
 
-from django.test import TestCase
+from django.test import TestCase, tag
 
 from llaor.exceptions import EntityNotFoundException
 from dictionary.factories import create_word_search_repo, create_word_repo
@@ -174,6 +174,7 @@ class WordRepoTestCase(TestCase):
                     ]),
                 ])
 
+    @tag('elasticsearch')
     def test_search_by_first_letter(self):
         WordRepoTestCase.TestScenario() \
                 .given_a_definition(word='a_word', scientific='s', type='t', meaning='one',
@@ -198,6 +199,7 @@ class WordRepoTestCase(TestCase):
                     ]),
                 ])
 
+    @tag('elasticsearch')
     def test_search_words_meanings(self):
         WordRepoTestCase.TestScenario() \
                 .given_a_definition(word='a_word', scientific='s', type='t', meaning='one target',
@@ -222,6 +224,7 @@ class WordRepoTestCase(TestCase):
                     ]),
                 ])
 
+    @tag('elasticsearch')
     def test_get_word_meanings_random(self):
         WordRepoTestCase.TestScenario() \
                 .given_a_definition(word='a_word', scientific='s', type='t', meaning='one',
@@ -315,6 +318,7 @@ class WordRepoTestCase(TestCase):
 
 class WordSearchRepoTestCase(TestCase):
 
+    @tag('elasticsearch')
     def test_search_by_first_letter(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('a', [])) \
@@ -326,6 +330,7 @@ class WordSearchRepoTestCase(TestCase):
                 .when_search_by_first_letter('a') \
                 .then_should_return(['a', 'adeu', 'ahola'])
 
+    @tag('elasticsearch')
     def test_search_by_first_letter_with_no_matches(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('baaa', [])) \
@@ -334,6 +339,7 @@ class WordSearchRepoTestCase(TestCase):
                 .when_search_by_first_letter('a') \
                 .then_should_return([])
 
+    @tag('elasticsearch')
     def test_get_random_word_returns_a_word(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('baaa', [])) \
@@ -342,11 +348,13 @@ class WordSearchRepoTestCase(TestCase):
                 .when_get_random_word() \
                 .then_should_return_one_of(['baaa', 'xyz'])
 
+    @tag('elasticsearch')
     def test_search_words_when_no_match(self):
         WordSearchRepoTestCase.TestScenario() \
                 .when_search_word('any') \
                 .then_should_return([])
 
+    @tag('elasticsearch')
     def test_search_words_matches_by_word(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('sabuda', [])) \
@@ -355,6 +363,7 @@ class WordSearchRepoTestCase(TestCase):
                 .when_search_word('sabuda') \
                 .then_should_return(['sabuda'])
 
+    @tag('elasticsearch')
     def test_search_words_matches_with_hyphen(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('avenar-se', [])) \
@@ -362,6 +371,7 @@ class WordSearchRepoTestCase(TestCase):
                 .when_search_word('avenar-se') \
                 .then_should_return(['avenar-se'])
 
+    @tag('elasticsearch')
     def test_search_words_matches_with_accent(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('després', [])) \
@@ -369,6 +379,7 @@ class WordSearchRepoTestCase(TestCase):
                 .when_search_word('després') \
                 .then_should_return(['després'])
 
+    @tag('elasticsearch')
     def test_search_words_matches_by_root_word(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('mallar', [])) \
@@ -376,6 +387,7 @@ class WordSearchRepoTestCase(TestCase):
                 .when_search_word('mallem') \
                 .then_should_return(['mallar'])
 
+    @tag('elasticsearch')
     def test_search_words_matches_femenine_gender(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('encalamunat -da', [])) \
@@ -383,6 +395,7 @@ class WordSearchRepoTestCase(TestCase):
                 .when_search_word('encalamunada') \
                 .then_should_return(['encalamunat -da'])
 
+    @tag('elasticsearch')
     def test_search_words_matches_with_typo(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('panasca', [])) \
@@ -390,6 +403,7 @@ class WordSearchRepoTestCase(TestCase):
                 .when_search_word('panaso') \
                 .then_should_return(['panasca'])
 
+    @tag('elasticsearch')
     def test_search_words_matches_by_description(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('mallorquer', [Meaning('', '', 'la planta del blat de moro', '', [], [])])) \
@@ -397,6 +411,7 @@ class WordSearchRepoTestCase(TestCase):
                 .when_search_word('blat') \
                 .then_should_return(['mallorquer'])
 
+    @tag('elasticsearch')
     def test_search_words_matches_by_scientific(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('sègol', [Meaning('secale cereale', '', '', '', [], [])])) \
@@ -404,6 +419,7 @@ class WordSearchRepoTestCase(TestCase):
                 .when_search_word('secale') \
                 .then_should_return(['sègol'])
 
+    @tag('elasticsearch')
     def test_search_words_matches_by_synonyms(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('corna', [Meaning('', '', '', '', ['bana'], [])])) \
@@ -411,6 +427,7 @@ class WordSearchRepoTestCase(TestCase):
                 .when_search_word('bana') \
                 .then_should_return(['corna'])
 
+    @tag('elasticsearch')
     def test_search_words_matches_by_related(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('lliri blanc', [Meaning('', '', '', '', [], ['assutzena'])])) \
@@ -418,6 +435,7 @@ class WordSearchRepoTestCase(TestCase):
                 .when_search_word('assutzena') \
                 .then_should_return(['lliri blanc'])
 
+    @tag('elasticsearch')
     def test_search_words_boosts_word_over_meaning(self):
         WordSearchRepoTestCase.TestScenario() \
                 .given_a_word(WordMeanings('cadell', [Meaning('', '', '', '', ['gosset'], [])])) \

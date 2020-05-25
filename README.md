@@ -22,6 +22,11 @@ docker-compose run api pytest
 docker-compose run api python manage.py test
 ```
 
+or exclude elasticsearch tests if desired:
+```bash
+docker-compose run api python manage.py test --exclude-tag=elasticsearch
+```
+
 ### DB setup
 
 Run this the first time:
