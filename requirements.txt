@@ -1,7 +1,6 @@
 certifi==2019.3.9
 Django==1.11.4
 django-cors-headers==3.0.2
-dj-database-url==0.4.1
 elasticsearch==6.2.0
 gunicorn==19.6.0
 mock==2.0.0
