@@ -1,6 +1,8 @@
 # Llaor api
 
 This api aims to handle data of a cultural collecting project.
+You can visit client website at [llaor.com](https://llaor.com)
+and its code repo [here](https://github.com/jordifierro/llaor-web).
 For the moment it's just composed by a dictionary.
 To enter data to dictionary we use django admin with the `Definition` model.
 A `Definition` is a definition of a `Meaning` for a certain `Word`.
