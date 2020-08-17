@@ -21,12 +21,14 @@ class AllWordsView(object):
 
 class WordView(object):
 
-    def __init__(self, word_repo):
+    def __init__(self, word_repo, daily_random_hash):
         self.word_repo = word_repo
 
     def get(self, word):
         if word == 'random':
             word_meanings = self.word_repo.get_random_word_meanings()
+        elif word == 'daily':
+            word_meanings = self.word_repo.get_random_word_meanings(seed=str(daily_random_hash))
         else:
             word_meanings = self.word_repo.get_word_meanings(word)
 

@@ -112,8 +112,10 @@ _Response:_
 
 #### `GET /words/<word>`
 #### `GET /words/random`
+#### `GET /words/daily`
 
 If random word, instead of fetch word called 'random', returns a random word.
+If daily word, instead of fetch word called 'daily', returns a random word each day.
 
 _Response:_
 ```json

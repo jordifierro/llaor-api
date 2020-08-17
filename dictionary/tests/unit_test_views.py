@@ -264,7 +264,8 @@ class TestWordView(object):
             return self
 
         def when_get_word_view(self, word):
-            self.body, self.status = WordView(word_repo=self.word_repo_mock).get(word=word)
+            self.body, self.status = WordView(word_repo=self.word_repo_mock,
+                                              daily_random_hash=0).get(word=word)
             return self
 
         def then_should_call_repo_get_meanings_for_word(self, word):

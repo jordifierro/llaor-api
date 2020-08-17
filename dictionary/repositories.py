@@ -57,8 +57,11 @@ class WordRepo(object):
         words = self.word_search_repo.search_words(text)
         return self.get_words_meanings(words)
 
-    def get_random_word_meanings(self):
-        word = self.word_search_repo.get_random_word()
+    def get_random_word_meanings(self, seed=None):
+        if seed is None:
+            word = self.word_search_repo.get_random_word()
+        else:
+            word = self.word_search_repo.get_random_word(seed)
         return self.get_word_meanings(word)
 
     def parse_meaning(self, orm_definition):
@@ -162,7 +165,7 @@ class WordSearchRepo(object):
 
         return [x['_id'] for x in res['hits']['hits']]
 
-    def get_random_word(self):
+    def get_random_word(self, seed=str(random.randint(1, 1000000))):
         search_query = {
             "size": 1,
             "query": {
@@ -170,7 +173,7 @@ class WordSearchRepo(object):
                     "functions": [
                         {
                             "random_score": {
-                                "seed": str(random.randint(1, 1000000))
+                                "seed": seed
                             }
                         }
                     ]
