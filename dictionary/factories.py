@@ -1,5 +1,7 @@
 from elasticsearch import Elasticsearch
 import certifi
+import datetime
+import pytz
 
 from django.conf import settings
 
@@ -20,7 +22,12 @@ def create_word_repo():
 
 
 def create_word_view(request):
-    return WordView(word_repo=create_word_repo())
+    now = datetime.datetime.now(tz=pytz.timezone('Europe/Madrid'))
+    days = now.day
+    months = now.month
+    years = now.year
+    daily_random_hash = days + months * 100 + years * 10000
+    return WordView(word_repo=create_word_repo(), daily_random_hash=daily_random_hash)
 
 
 def create_all_words_view(request):
