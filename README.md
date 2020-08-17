@@ -1,3 +1,5 @@
+![Logo](logo.png)
+
 # Llaor api
 
 This api aims to handle data of a cultural collecting project.
