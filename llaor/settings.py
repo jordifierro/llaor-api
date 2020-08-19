@@ -28,7 +28,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = bool(int(os.environ['DEBUG']))
 
 if not LOCAL_DEPLOY:
-    ALLOWED_HOSTS = [os.environ['ALLOWED_HOSTS'], ]
+    ALLOWED_HOSTS = [os.environ['HOST'], os.environ['INTERNAL_IP']]
     CORS_ORIGIN_WHITELIST = json.loads(os.environ['CORS_ORIGIN_WHITELIST'])
 
 
