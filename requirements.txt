@@ -1,4 +1,4 @@
-certifi==2019.3.9
+certifi==2022.12.7
 Django==1.11.4
 django-cors-headers==3.0.2
 elasticsearch==6.2.0
